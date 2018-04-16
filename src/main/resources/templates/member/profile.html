@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{../../static/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css" th:href="@{../../static/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <link rel="stylesheet" href="../../static/css/w3.css" th:href="@{../../static/css/w3.css}"/>
+    <title>会员简介</title>
+</head>
+<body>
+
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" th:href="@{index}">Tickets</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html" th:href="@{index}">Tickets</a></li>
+                <li><a href="statistics.html" th:href="@{statistics}">Statistics<span class="sr-only">(current)</span></a></li>
+                <li class="active"><a href="profile.html" th:href="@{profile}">Profile</a></li>
+                <li><a href="coupon.html" th:href="@{coupon}">Coupon</a> </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Welcome<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../account/index.html" th:href="@{../logout}">Sign out</a></li>
+                        <li><a href="../account/register.html" th:href="@{../register}">Register</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="mainpage">
+    <div class="table-responsive">
+        <table class="w3-table w3-bordered w3-striped w3-card-4">
+            <tr>
+                <th>条目</th>
+                <th>信息</th>
+            </tr>
+            <tr>
+                <td>编号</td>
+                <td th:text="${member.id}"></td>
+            </tr>
+            <tr>
+                <td>邮箱</td>
+                <td th:text="${member.email}"></td>
+            </tr>
+            <tr>
+                <td>用户名</td>
+                <td th:text="${member.name}"></td>
+            </tr>
+            <tr>
+                <td>手机号</td>
+                <td th:text="${member.phone}"></td>
+            </tr>
+            <tr>
+                <td>会员资格</td>
+                <td th:text="${member.qualification}"></td>
+            </tr>
+            <tr>
+                <td>会员等级</td>
+                <td th:text="${member.level}"></td>
+            </tr>
+            <tr>
+                <td>会员积分</td>
+                <td th:text="${member.point}"></td>
+            </tr>
+            <tr>
+                <td>会员折扣</td>
+                <td th:text="${member.discount}+'%'"></td>
+            </tr>
+            <tr>
+                <td>会员余额</td>
+                <td th:text="${member.money}"></td>
+            </tr>
+
+        </table>
+    </div>
+    <p style="margin-top: 10px">
+        <button type="button" class="btn btn-info editButton" data-toggle="modal"
+                data-target="#editModal">编辑
+        </button>
+        <button type="button" class="btn btn-danger stopButton" data-toggle="modal"
+                data-target="#stopModal">取消会员资格
+        </button>
+    </p>
+</div>
+
+
+<!--<div th:include="footer :: copy"></div>-->
+
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">更新个人信息</h4>
+        </div>
+            <form class="form-horizontal" action="profile.html" th:action="@{/member/edit}" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">姓名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="您的姓名"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="col-sm-2 control-label">邮箱</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" name="email" id="email" placeholder="您的邮箱"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="col-sm-2 control-label">手机号</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="phone" id="phone"
+                                   placeholder="您的手机号"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary edit" onclick="save()">保存</button>
+                </div>
+            </form>
+            <div class="err-msg"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="stopModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">取消会员资格</h4>
+            </div>
+            <form class="form-horizontal" action="profile.html" th:action="@{/member/edit}" method="post">
+                <div class="modal-body">
+                    <div class="form-group text-danger">
+                        <p class="col-md-offset-2">您确定要停止会员资格吗? 这个操作将无法挽回!</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="col-sm-2 control-label">您的密码</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" name="password" id="password"
+                                   placeholder="您的密码"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-danger stop" onclick="stop()">我了解取消会员资格的后果</button>
+                </div>
+            </form>
+            <div class="err-msg"></div>
+        </div>
+    </div>
+</div>
+
+
+<!--Scripts-->
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:inline="javascript">
+        function save() {
+        // alert("按下保存");
+        var $edit = $('#editModal');
+        var name = $edit.find('input[name="name"]').val();
+        var email = $edit.find('input[name="email"]').val();
+        var phone = $edit.find('input[name="phone"]').val();
+        var inputs = {name:name, email:email, phone:phone};
+        // alert(JSON.stringify(inputs));
+        $.ajax({
+            type:"POST",
+            url:"/member/edit",
+            data:inputs,
+            dataType:"json",
+            success:function(data){
+                alert("已保存");
+                location.reload();
+            }
+        });
+    }
+    function stop(){
+        // alert("按下停止");
+        var $stop = $('#stopModal');
+        var password = $stop.find('input[name="password"]').val();
+        var inputs = {password:password};
+        // alert(JSON.stringify(inputs));
+        $.ajax({
+            type:"POST",
+            url:"/member/stop",
+            data:inputs,
+            dataType:"json",
+            success:function(data){
+                alert("已取消资格");
+                // alert(data);
+
+                location.replace("http://localhost:8080/");
+            }
+        })
+    }
+</script>
+</body>
+</html>

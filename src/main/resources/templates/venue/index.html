@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{../../static/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css"
+          th:href="@{../../static/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <title>场馆首页</title>
+</head>
+<body>
+
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" th:href="@{index}">Tickets</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html" th:href="@{http://localhost:8080/venue/index}">Venue Status<span
+                        class="sr-only">(current)</span></a></li>
+                <li><a href="scene.html" th:href="@{http://localhost:8080/venue/scene}">Venue Scene</a></li>
+                <li><a href="info.html" th:href="@{http://localhost:8080/venue/info}">Venue Info</a></li>
+                <li><a href="statistics.html" th:href="@{http://localhost:8080/venue/statistics}">Statistics</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Welcome<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../account/index.html" th:href="@{../logout}">Sign out</a></li>
+                        <li><a href="../account/register.html" th:href="@{../register}">Register</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="mainpage">
+    <!--已发布的计划-->
+    <div class="panel panel-info">
+        <!-- Default panel contents -->
+        <div class="panel-heading">已发布的计划</div>
+
+
+        <div class="table-responsive " style="overflow-x: auto; overflow-y: auto; height: 200px; width:1439px;">
+            <table id="roomTable" class="table table-hover">
+                <tr>
+                    <th>计划编号</th>
+                    <th>场馆名</th>
+                    <th>活动日期</th>
+                    <th>活动类型</th>
+                    <th>活动描述</th>
+                    <th>前排座位价格</th>
+                    <th>后排座位价格</th>
+                </tr>
+                <tr th:each="plan:${indexplan}">
+                    <td th:text="${plan.pid}"></td>
+                    <td th:text="${plan.vname}"></td>
+                    <td th:text="${#dates.format(new java.util.Date(plan.date),'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${plan.type}"></td>
+                    <td th:text="${plan.description}"></td>
+                    <td th:text="${plan.fprice}"></td>
+                    <td th:text="${plan.bprice}"></td>
+                </tr>
+
+            </table>
+        </div>
+
+
+    </div>
+    <div>
+        <a href="javascript:" class="btn btn-primary my-pop-1">发布新的计划</a>
+    </div>
+
+</div>
+
+<div class="cd-user-modal cd-user-modal-1">
+    <div class="cd-user-modal-container">
+        <!--添加发布计划-->
+
+        <div class="panel panel-info">
+            <!-- Default panel contents -->
+            <div class="panel-heading">发布新计划</div>
+            <form class="form-horizontal" action="index.html">
+                <div class="form-group">
+                    <label for="time" class="col-sm-2 control-label">活动日期</label>
+                    <div class="col-sm-10">
+                        <input type="datetime-local" class="form-control" name="time" id="time"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="type" class="col-sm-2 control-label">活动类型</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="type" id="type" placeholder="活动类型"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="col-sm-2 control-label">活动描述</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="description" id="description" placeholder="活动描述"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="fprice" class="col-sm-2 control-label">前排座位价格</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" name="fprice" id="fprice" placeholder="前排座位价格"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bprice" class="col-sm-2 control-label">后排座位价格</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" name="bprice" id="bprice" placeholder="后排座位价格"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10   col-md-4">
+                        <button type="submit" class=" btn btn-primary modal-apply">发布</button>
+                        <a href="#" class="btn btn-danger modal-cancel">取消</a>
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!--Scripts-->
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script src="../../static/js/npm.js" th:src="@{../../static/js/npm.js}"></script>
+<script src="../../static/js/promptForm.js" th:src="@{../../static/js/promptForm.js}"></script>
+<script th:inline="javascript">
+
+   function reurl(){
+       url = location.href;
+       if(url.substring(url.length-5,url.length) == "login"){
+           url = url.substring(0,url.length-5);
+           url = url+"venue/index";
+       }
+       var times = url.split("?");
+       if(times[1] != 1){
+           url += "?1";
+           self.location.replace(url);
+       }
+   }
+   onload=reurl;
+
+    $('.modal-apply').on('click', function (e) {
+        e.preventDefault();
+
+        var form = $(this).parent().parent().parent();
+
+        var time = form.find('input[name="time"]').val();
+        var type = form.find('input[name="type"]').val();
+        var description = form.find('input[name="description"]').val();
+        var fprice = form.find('input[name="fprice"]').val();
+        var bprice = form.find('input[name="bprice"]').val();
+
+        var inputs = {time: time, type: type, description: description, fprice: fprice, bprice: bprice};
+
+        alert(JSON.stringify(inputs));
+
+        $.ajax({
+            type: "POST",
+            url: '/venue/savePlan',
+            data: inputs,
+            dataType: 'json',
+            success: function (data) {
+
+                location.reload();
+
+            }
+        });
+    });
+</script>
+</body>
+</html>

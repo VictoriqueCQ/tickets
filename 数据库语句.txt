@@ -1,0 +1,42 @@
+CREATE TABLE `hotel`.`member` (
+  `mid` INT NOT NULL,
+  `qualification` INT NOT NULL,
+  `level` INT NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `phone` INT NOT NULL,
+  PRIMARY KEY (`idmember`));
+
+CREATE TABLE `hotel`.`venue` (
+  `vid` INT NOT NULL,
+  `location` VARCHAR(45) NOT NULL,
+  `fsnumber` INT NOT NULL,
+  `bsnumber` INT NOT NULL,
+  `fsnumremained` INT NOT NULL,
+  `rbsnumremained` INT NOT NULL,
+  PRIMARY KEY (`vid`));
+  
+CREATE TABLE `hotel`.`plan` (
+  `pid` INT NOT NULL,
+  `vid` INT NOT NULL,
+  `date` DATE NOT NULL,
+  `fprice` INT NOT NULL,
+  `bprice` INT NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`pid`));
+
+CREATE TABLE `hotel`.`consumption` (
+  `cid` INT NOT NULL,
+  `vid` INT NOT NULL,
+  `mid` INT NOT NULL,
+  `date` DATE NOT NULL,
+  `fnumber` INT NOT NULL,
+  `bnumber` INT NOT NULL,
+  `fprice` INT NOT NULL,
+  `bprice` INT NOT NULL,
+  `aprice` INT NOT NULL,
+  `predefine` INT NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `orderdate` DATE NOT NULL,
+  PRIMARY KEY (`cid`));

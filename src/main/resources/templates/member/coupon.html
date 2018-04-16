@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{../../static/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css" th:href="@{../../static/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <link rel="stylesheet" href="../../static/css/w3.css" th:href="@{../../static/css/w3.css}"/>
+    <title>会员兑换优惠券</title>
+
+    <style type="text/css">
+        .hr3 {
+            height: 5px;
+            border: none;
+            border-top: 5px ridge #45D6D8;
+        }
+    </style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" th:href="@{index}">Tickets</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html" th:href="@{index}">Tickets</a></li>
+                <li><a href="statistics.html" th:href="@{statistics}">Statistics<span class="sr-only">(current)</span></a></li>
+                <li><a href="profile.html" th:href="@{profile}">Profile</a></li>
+                <li class="active"><a href="coupon.html" th:href="@{coupon}">Coupon</a> </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Welcome<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../account/index.html" th:href="@{../logout}">Sign out</a></li>
+                        <li><a href="../account/register.html" th:href="@{../register}">Register</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="mainpage">
+    <div class="col-md-12">
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-8">
+            <h1 class="text-center">优惠券兑换</h1>
+            <hr class="hr3"/>
+        </div>
+        <div class="col-md-2">
+            <div>
+                <table>
+                    <tr>
+                        <td>当前剩余积分：</td>
+                        <td th:text="${coupon.point}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h3 class="text-center">初级优惠券</h3>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <br/><br/>
+                    <p class="text-center">消耗500积分</p>
+                    <br/><br/>
+                    <p class="text-center">兑换10元优惠券</p>
+                    <br/><br/>
+                    <h6 class="text-center">注意！兑换操作不可逆！</h6>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-success btn-lg" onclick="low()">兑换初级优惠券</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h3 class="text-center">中级优惠券</h3>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <br/><br/>
+                    <p class="text-center">消耗1000积分</p>
+                    <br/><br/>
+                    <p class="text-center">兑换25元优惠券</p>
+                    <br/><br/>
+                    <h6 class="text-center">注意！兑换操作不可逆！</h6>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-info btn-lg" onclick="middle()">兑换中级优惠券</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h3 class="text-center">高级优惠券</h3>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <br/><br/>
+                    <p class="text-center">消耗2000积分</p>
+                    <br/><br/>
+                    <p class="text-center">兑换60元优惠券</p>
+                    <br/><br/>
+                    <h6 class="text-center">注意！兑换操作不可逆！</h6>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="high()">兑换高级优惠券</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<!--Scripts-->
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    function low() {
+        alert("您已兑换初级优惠券");
+        var inputs={point:500};
+        $.ajax({
+            type:"POST",
+            url:"/member/reducePoint",
+            data:inputs,
+            dataType:"json",
+            success:function(data){
+                alert("已更新");
+                location.reload();
+            }
+        });
+    }
+    function middle() {
+        alert("您已兑换中级优惠券");
+        var inputs={point:1000};
+        $.ajax({
+            type:"POST",
+            url:"/member/reducePoint",
+            data:inputs,
+            dataType:"json",
+            success:function(data){
+                alert("已更新");
+                location.reload();
+            }
+        });
+    }
+    function high() {
+        alert("您已兑换高级优惠券");
+        var inputs={point:2000};
+        $.ajax({
+            type:"POST",
+            url:"/member/reducePoint",
+            data:inputs,
+            dataType:"json",
+            success:function(data){
+                alert("已更新");
+                location.reload();
+            }
+        });
+    }
+</script>
+</body>
+</html>

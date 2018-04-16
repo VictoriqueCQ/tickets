@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{../../static/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css"
+          th:href="@{../../static/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <title>选座购买</title>
+
+
+</head>
+<body>
+<h1>选择你想要的座位</h1>
+<div class="mainpage">
+    <div class="col-md-12">
+        <div class="col-md-8">
+            <div class="col-md-12">
+                <div>
+                    <div class="panel panel-info">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">前排座位选择</div>
+                        <div class="table-responsive "
+                             style="overflow-x: auto; overflow-y: auto; height: 200px; width:879px;">
+                            <table class="table table-hover" id="frontTable">
+                                <tr>
+                                    <th style="width: 750px;">No</th>
+                                    <th style="width: 129px;">Action</th>
+                                </tr>
+                                <tr th:each="front : ${frontseat}">
+                                    <td class="fnum" style="width: 750px;" th:text="${front.seatnumber}">00001</td>
+                                    <td style="width: 129px;">
+                                        <input type="checkbox"/> 选择此座位
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div>
+                    <div class="panel panel-info">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">后排座位选择</div>
+                        <div class="table-responsive "
+                             style="overflow-x: auto; overflow-y: auto; height:200px; width:879px;">
+                            <table class="table table-hover" id="backTable">
+                                <tr>
+                                    <th style="width: 750px;">No</th>
+                                    <th style="width: 129px;">Action</th>
+                                </tr>
+                                <tr th:each="back : ${backseat}">
+                                    <td class="bnum" style="width: 750px;" th:text="${back.seatnumber}">00001</td>
+                                    <td style="width: 129px;">
+                                        <input type="checkbox"/> 选择此座位
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <button onclick="selectbuy()">购买</button>
+            </div>
+        </div>
+        <div class="col-md-4">
+
+        </div>
+    </div>
+</div>
+<!--<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>-->
+<script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    $(function () {
+//加上判断是否达到数量要求
+        if ($(":checkbox").size() >= 6) {
+            $(":checkbox").removeAttr("checked");
+            $(":checkbox").attr("disabled", "disabled");
+            $(":checkbox").removeAttr("disabled");
+        }
+
+        var num = 0;
+        $(":checkbox").each(function () {
+            $(this).click(function () {
+                if ($(this)[0].checked) {
+                    ++num;
+                    if (num == 6) {
+                        //alert("最多选择 三项 的上限已满, 其他选项将会变为不可选.");
+                        $(":checkbox").each(function () {
+                            if (!$(this)[0].checked) {
+                                $(this).attr("disabled", "disabled");
+                            }
+                        });
+                    }
+                } else {
+                    --num;
+                    if (num == 5 || num == 4 || num == 3 || num == 2 || num == 1 || num == 0) {
+
+                        $(":checkbox").each(function () {
+                            if (!$(this)[0].checked) {
+                                $(this).removeAttr("disabled");
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    function selectbuy() {
+        var frontselect = [];
+        var backselect = [];
+        // $("#frontTable input[type='checkbox']").each(function(i,e){
+        //     checked = $(this).prop("checked");
+        //     if(checked){
+        //         var fid = $(this).parents("tr").text();
+        //         // $tr = $(this).parent().parent().parent();
+        //         // object += $tr.find("#two").text()+","+$tr.find("#three").text()+","+$tr.find("#four").text()+","+$tr.find("#six").text()+":";
+        //
+        //     }
+        // });
+        $(":checkbox:checked").each(function () {
+            // var tablerow = $(this).parent("tr");
+            // var code = tablerow.find("[name='p_code']").val();
+            // var name= tablerow.find("[name='p_name']").val();
+            // var price= tablerow.find("[name='p_price']").val();
+            // selectedData.push({Code:code,Name:name,Price:price});
+            var fid = $(this).parents("tr").find(".fnum").text();
+            // alert(fid);
+            if (fid != "") {
+                frontselect.push({fid: fid});
+            }
+
+        });
+        $(":checkbox:checked").each(function () {
+            var bid = $(this).parents("tr").find(".bnum").text();
+            // alert(bid);
+            if (bid != "") {
+                backselect.push({bid: bid});
+            }
+        });
+        var inputs = {frontselect: JSON.stringify(frontselect), backselect: JSON.stringify(backselect)};
+        console.log(inputs);
+        alert(JSON.stringify(inputs));
+        // var $mainpage = $('#mainpage');
+        // var fnumber = $mainpage.find('input[name="fnumber"]').val();
+        // var bnumber = $mainpage.find('input[name="bnumber"]').val();
+        // var pid = sessionStorage["pid"];
+        // var inputs = {pid:pid,fnumber:fnumber,bnumber:bnumber};
+        // alert(JSON.stringify(inputs));
+        $.ajax({
+            type: "POST",
+            url: "/member/orderSelect",
+            data: inputs,
+            dataType: "json",
+            success: function (data) {
+                alert(JSON.stringify(data));
+                url = location.href.split("?")[0];
+                url = url.substring(0, url.length - 8);
+                url = url + "statistics";
+                alert(url);
+                window.location.href = url;
+            }
+        });
+    }
+
+    // $('.modal-buy').on('click', function () {
+    //
+    // });
+</script>
+</body>
+</html>
