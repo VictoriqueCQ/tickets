@@ -5,7 +5,8 @@ import cn.tickets.repository.*;
 import cn.tickets.service.MemberService;
 import cn.tickets.util.Default;
 import cn.tickets.vo.*;
-import org.hibernate.Transaction;
+import org.hibernate.Transaction
+        ;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
