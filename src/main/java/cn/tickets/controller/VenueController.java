@@ -115,6 +115,7 @@ public class VenueController {
         return result;
     }
 
+    
     //以下是管理信息系统作业新增代码
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int vid) {
