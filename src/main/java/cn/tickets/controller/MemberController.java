@@ -213,10 +213,6 @@ public class MemberController {
     //以下是管理信息系统作业新增代码
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int mid) {
-//        model.addAttribute("member", memberService.getMemberProfile(id));
-//
-//        return "member/profile";
-//        return memberService.analysis(model,mid);
         model.addAttribute("memberAnalysis",memberService.analysis(model,mid));
         return "member/analysis";
     }

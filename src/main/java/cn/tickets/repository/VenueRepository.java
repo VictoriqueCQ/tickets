@@ -25,4 +25,6 @@ public interface VenueRepository extends JpaRepository<VenueEntity, Integer> {
 
     VenueEntity findBySystemid(String systemid);
 
+    VenueEntity findById(int id);
+
 }
