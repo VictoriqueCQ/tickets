@@ -200,98 +200,122 @@ public class MemberServiceImpl implements MemberService {
     public MemberAnalysisVO analysis(Model model, int mid) {
         MemberAnalysisVO memberAnalysisVO = new MemberAnalysisVO();
         List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
-        System.err.println(listLastYear.toString());
+//        System.err.println(listLastYear.toString());
         List<ConsumptionEntity> listLastMonth = consumptionRepository.consumptionsLastMonth(mid);
-        System.err.println(listLastMonth.toString());
+//        System.err.println(listLastMonth.toString());
 
         //月平均订单单价
-        int allPriceLastMonth = 0;
-        for (ConsumptionEntity consumptionEntity : listLastMonth) {
-            allPriceLastMonth += consumptionEntity.getAprice();
+        String averagePriceLastMonth = "";
+        if (listLastMonth.size() > 0) {
+            int allPriceLastMonth = 0;
+            for (ConsumptionEntity consumptionEntity : listLastMonth) {
+                allPriceLastMonth += consumptionEntity.getAprice();
+            }
+
+            averagePriceLastMonth = allPriceLastMonth / listLastMonth.size() + "元/月";
+        }else{
+            averagePriceLastMonth = "0元/月";
         }
-        String averagePriceLastMonth = allPriceLastMonth / listLastMonth.size() + "元/月";
         memberAnalysisVO.setAveragePerMonth(averagePriceLastMonth);
 
         //各种年平均
-        TreeSet<String> activitySet = new TreeSet<>();
-        TreeSet<Integer> venueIdSet = new TreeSet<>();
-        int allPriceLastYear = 0;
-        int refundTime = 0;//退单单数
-        for (ConsumptionEntity consumptionEntity : listLastYear) {
-            allPriceLastYear += consumptionEntity.getAprice();
-            activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
-            venueIdSet.add(consumptionEntity.getVid());//获得所有场馆id的集合
-            if (consumptionEntity.getPredefine() == 0) {
-                refundTime += 1;
+        String averagePriceLastYear = "";
+        List<String> activityKeyList = new ArrayList<>();
+        List<String> venueKeyList = new ArrayList<>();
+        String refundRatio = "";
+        String orderRatio = "";
+        if(listLastYear.size()>0){
+            TreeSet<String> activitySet = new TreeSet<>();
+            TreeSet<Integer> venueIdSet = new TreeSet<>();
+            int allPriceLastYear = 0;
+            int refundTime = 0;//退单单数
+            for (ConsumptionEntity consumptionEntity : listLastYear) {
+                allPriceLastYear += consumptionEntity.getAprice();
+                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+                venueIdSet.add(consumptionEntity.getVid());//获得所有场馆id的集合
+                if (consumptionEntity.getPredefine() == 0) {
+                    refundTime += 1;
+                }
             }
+            System.err.println("退单次数" + refundTime);
+            averagePriceLastYear = allPriceLastYear / listLastYear.size() + "元/月";
+
+
+
+            //退单率计算
+            DecimalFormat df = new DecimalFormat("0.0");
+            refundRatio = df.format(((double) refundTime / listLastYear.size()) * 100) + "%";
+
+            //下单频率计算
+            orderRatio = df.format((double) listLastYear.size() / 12) + "单/月";
+
+
+            //活动集合
+            TreeMap<String, Integer> activityMap = new TreeMap<>();
+            for (String activity : activitySet) {
+                int num = 0;
+                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                    if (consumptionEntity.getType().equals(activity)) {
+                        num += 1;
+                    }
+                }
+                //获得所有活动参加的次数
+                activityMap.put(activity, num);
+            }
+            int activityMaxTimes = 0;
+            for (Integer time : activityMap.values()) {
+                //获得最大参加次数
+                activityMaxTimes = activityMaxTimes >= time ? activityMaxTimes : time;
+            }
+
+            for (String getKey : activityMap.keySet()) {
+                //获得最大参加次数的活动的列表
+                if (activityMap.get(getKey) == activityMaxTimes) {
+                    activityKeyList.add(getKey);
+                }
+            }
+
+
+            //场馆集合
+            TreeMap<Integer, Integer> venueMap = new TreeMap<>();
+            for (Integer venueId : venueIdSet) {
+                int num = 0;
+                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                    if (consumptionEntity.getVid() == venueId) {
+                        num += 1;
+                    }
+                }
+                //获得所有场馆去的次数集合
+                venueMap.put(venueId, num);
+            }
+            int venueMaxTimes = 0;
+            for (Integer time : venueMap.values()) {
+                //获得去场馆最大次数
+                venueMaxTimes = venueMaxTimes >= time ? venueMaxTimes : time;
+            }
+
+            for (Integer getKey : venueMap.keySet()) {
+                if (venueMap.get(getKey) == venueMaxTimes) {
+                    VenueEntity venueEntity = venueRepository.findOne(getKey);
+                    venueKeyList.add(venueEntity.getName());
+                }
+            }
+
+        }else{
+            averagePriceLastYear = "0元/月";
+            activityKeyList.add("无");
+            venueKeyList.add("无");
+            refundRatio = "--%";
+            orderRatio = "0单/月";
         }
-        System.err.println("退单次数"+refundTime);
-        String averagePriceLastYear = allPriceLastYear / listLastYear.size() + "元/月";
         //年平均订单单价
         memberAnalysisVO.setAveragePerYear(averagePriceLastYear);
-
-        DecimalFormat df = new DecimalFormat("0.0");
-        String refundRatio = df.format(((double)refundTime/listLastYear.size())*100) + "%";
+        memberAnalysisVO.setMostActivity(activityKeyList.toString());
+        memberAnalysisVO.setMostVenue(venueKeyList.toString());
         //退单率
         memberAnalysisVO.setRefundRatio(refundRatio);
-
-
-        String orderRatio = df.format((double)listLastYear.size()/12) +"单/月";
         //下单频率
         memberAnalysisVO.setOrderRatio(orderRatio);
-
-        //活动集合
-        TreeMap<String, Integer> activityMap = new TreeMap<>();
-        for (String activity : activitySet) {
-            int num = 0;
-            for (ConsumptionEntity consumptionEntity : listLastYear) {
-                if (consumptionEntity.getType().equals(activity)) {
-                    num += 1;
-                }
-            }
-            //获得所有活动参加的次数
-            activityMap.put(activity, num);
-        }
-        int activityMaxTimes = 0;
-        for (Integer time : activityMap.values()) {
-            //获得最大参加次数
-            activityMaxTimes = activityMaxTimes >= time ? activityMaxTimes : time;
-        }
-        List<String> activityKeyList = new ArrayList<>();
-        for (String getKey : activityMap.keySet()) {
-            //获得最大参加次数的活动的列表
-            if (activityMap.get(getKey) == activityMaxTimes) {
-                activityKeyList.add(getKey);
-            }
-        }
-        memberAnalysisVO.setMostActivity(activityKeyList.toString());
-
-        //场馆集合
-        TreeMap<Integer, Integer> venueMap = new TreeMap<>();
-        for (Integer venueId : venueIdSet) {
-            int num = 0;
-            for (ConsumptionEntity consumptionEntity : listLastYear) {
-                if (consumptionEntity.getVid() == venueId) {
-                    num += 1;
-                }
-            }
-            //获得所有场馆去的次数集合
-            venueMap.put(venueId, num);
-        }
-        int venueMaxTimes = 0;
-        for (Integer time : venueMap.values()) {
-            //获得去场馆最大次数
-            venueMaxTimes = venueMaxTimes >= time ? venueMaxTimes : time;
-        }
-        List<String> venueKeyList = new ArrayList<>();
-        for (Integer getKey : venueMap.keySet()) {
-            if (venueMap.get(getKey) == venueMaxTimes) {
-                VenueEntity venueEntity = venueRepository.findOne(getKey);
-                venueKeyList.add(venueEntity.getName());
-            }
-        }
-        memberAnalysisVO.setMostVenue(venueKeyList.toString());
-
 
         return memberAnalysisVO;
     }
