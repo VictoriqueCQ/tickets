@@ -8,6 +8,7 @@
           th:href="@{../../static/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
     <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <script src="../../static/js/echarts.min.js" th:src="@{../../js/echarts.min.js}"></script>
     <title>Member Analysis</title>
 </head>
 <body>
@@ -35,7 +36,7 @@
                 <li><a href="statistics.html" th:href="@{statistics}">Statistics</a></li>
                 <li><a href="profile.html" th:href="@{profile}">Profile</a></li>
                 <li><a href="coupon.html" th:href="@{coupon}">Coupon</a></li>
-                <li class="active"><a href="analysis.html" th:href="@{analysis}">Analysis</a> </li>
+                <li class="active"><a href="analysis.html" th:href="@{analysis}">Analysis</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -51,5 +52,77 @@
     </div><!-- /.container-fluid -->
 </nav>
 
+<div class="mainpage">
+    <div class="col-md-12">
+        <h2>平均订单单价</h2>
+        <div class="col-md-6">
+            <p>过去一月平均订单单价</p>
+            <p th:text="${memberAnalysis.averagePerMonth}">100</p>
+        </div>
+        <div class="col-md-6">
+            <p>过去一年平均订单单价</p>
+            <p th:text="${memberAnalysis.averagePerYear}">100</p>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <h2>活动类型分布</h2>
+        <div class="col-md-8">
+            <div id="activity" style="width: 720px;height:400px;"></div>
+        </div>
+
+        <div class="col-md-4">
+            过去一年中，您参与的最多的活动是
+            <p th:text="${memberAnalysis.mostActivity}"></p>
+        </div>
+    </div>
+</div>
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    var activityChart = echarts.init(document.getElementById("activity"));
+    var activityOption = {
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            x: 'left',
+            data: ['Member Card', 'Cash', 'Credit Card']
+        },
+        series: [
+            {
+                name: 'Num of type',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        show: true,
+                        textStyle: {
+                            fontSize: '30',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data: [
+                    {value: 335, name: 'Member Card'},
+                    {value: 310, name: 'Cash'},
+                    {value: 234, name: 'Credit Card'}
+                ]
+            }
+        ]
+    };
+    activityChart.setOption(activityOption);
+</script>
 </body>
 </html>
