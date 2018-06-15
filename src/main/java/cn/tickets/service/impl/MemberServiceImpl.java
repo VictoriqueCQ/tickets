@@ -196,8 +196,10 @@ public class MemberServiceImpl implements MemberService {
 
     //以下是管理信息系统作业新增代码
     @Override
-    public String analysis(Model model, int mid) {
-        return null;
+    public MemberAnalysisVO analysis(Model model, int mid) {
+        MemberAnalysisVO memberAnalysisVO = new MemberAnalysisVO();
+
+        return memberAnalysisVO;
     }
 
 }

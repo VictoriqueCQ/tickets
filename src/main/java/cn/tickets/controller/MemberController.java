@@ -221,4 +221,34 @@ public class MemberController {
         return "member/analysis";
     }
 
+    @RequestMapping("/activityDistribution")
+    @ResponseBody
+    public Map<String,Object> activityDistribution(){
+
+
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @RequestMapping("/consumptionDistribution")
+    @ResponseBody
+    public Map<String,Object> consumptionDistribution(){
+
+
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @RequestMapping("/venueDistribution")
+    @ResponseBody
+    public Map<String,Object> venueDistribution(){
+
+
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
 }

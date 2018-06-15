@@ -2,6 +2,7 @@ package cn.tickets.service;
 
 import cn.tickets.entity.ConsumptionEntity;
 import cn.tickets.entity.MemberEntity;
+import cn.tickets.vo.MemberAnalysisVO;
 import cn.tickets.vo.MemberInfoVO;
 import org.springframework.ui.Model;
 
@@ -26,6 +27,6 @@ public interface MemberService {
     boolean unSubscribe(int cid);
 
     //以下是管理信息系统新增代码
-    String analysis(Model model, int mid);
+    MemberAnalysisVO analysis(Model model, int mid);
 
 }
