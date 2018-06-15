@@ -9,10 +9,7 @@ import cn.tickets.service.MemberService;
 import cn.tickets.service.VenueService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.GeneratedValue;
 import java.util.List;
@@ -72,5 +69,11 @@ public class ManagerController {
     @ResponseBody
     public Map<String,Object> getSettlement(){
         return managerService.getSettlement();
+    }
+
+    //以下是管理信息系统作业新增代码
+    @RequestMapping("/analysis")
+    public String analysis(Model model, @SessionAttribute("userID") int mid) {
+        return managerService.analysis(model);
     }
 }

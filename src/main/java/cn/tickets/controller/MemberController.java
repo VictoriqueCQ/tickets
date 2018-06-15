@@ -211,11 +211,8 @@ public class MemberController {
 
 
     //以下是管理信息系统作业新增代码
-
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int mid) {
-//        model.addAttribute("locale", locale);
-//        return memberService.statistics(model, mid);
         return memberService.analysis(model,mid);
     }
 
