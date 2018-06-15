@@ -69,6 +69,13 @@ public class VenueServiceImpl implements VenueService {
         return "venue/statistics";
     }
 
+
+    //以下是管理信息系统新增代码
+    @Override
+    public String anaylsis(Model model, int vid) {
+        return null;
+    }
+
     public VenueStatisticsVO buildVenueStatisticsVO(
             List<ConsumptionEntity> bookConsumptionEntities,
             List<ConsumptionEntity> unsubscribeConsumptionEntities,

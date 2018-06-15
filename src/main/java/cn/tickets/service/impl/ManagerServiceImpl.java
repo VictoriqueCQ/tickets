@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -195,6 +196,13 @@ public class ManagerServiceImpl implements ManagerService {
         result.put(Default.HTTP_RESULT,true);
         return result;
 
+    }
+
+
+    //以下是管理信息系统作业新增代码
+    @Override
+    public String analysis(Model model) {
+        return null;
     }
 
 

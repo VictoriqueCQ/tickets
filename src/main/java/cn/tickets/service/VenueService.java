@@ -16,7 +16,7 @@ public interface VenueService {
 
     String statistics(Model model, int vid);
 
-
-
+    //以下是管理信息系统新增代码
+    String anaylsis(Model model,int vid);
 
 }

@@ -4,10 +4,7 @@ import cn.tickets.entity.ConsumptionEntity;
 import cn.tickets.entity.MemberEntity;
 
 import cn.tickets.entity.SeatEntity;
-import cn.tickets.service.ConsumptionService;
-import cn.tickets.service.MemberService;
-import cn.tickets.service.PlanService;
-import cn.tickets.service.SeatService;
+import cn.tickets.service.*;
 import cn.tickets.util.Default;
 import cn.tickets.vo.BackSeatVO;
 import cn.tickets.vo.FrontSeatVO;
@@ -209,6 +206,17 @@ public class MemberController {
         Map<String, Object> result = new TreeMap<>();
         result.put(Default.HTTP_RESULT, true);
         return result;
+    }
+
+
+
+    //以下是管理信息系统作业新增代码
+
+    @RequestMapping("/analysis")
+    public String analysis(Model model, @SessionAttribute("userID") int mid) {
+//        model.addAttribute("locale", locale);
+//        return memberService.statistics(model, mid);
+        return memberService.analysis(model,mid);
     }
 
 }

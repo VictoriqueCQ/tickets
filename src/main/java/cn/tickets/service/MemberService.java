@@ -25,4 +25,7 @@ public interface MemberService {
 
     boolean unSubscribe(int cid);
 
+    //以下是管理信息系统新增代码
+    String analysis(Model model, int mid);
+
 }

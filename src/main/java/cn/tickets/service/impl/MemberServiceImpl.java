@@ -193,4 +193,11 @@ public class MemberServiceImpl implements MemberService {
         return true;
     }
 
+
+    //以下是管理信息系统作业新增代码
+    @Override
+    public String analysis(Model model, int mid) {
+        return null;
+    }
+
 }
