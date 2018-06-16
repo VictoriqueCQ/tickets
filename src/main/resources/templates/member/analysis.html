@@ -8,7 +8,7 @@
           th:href="@{../../static/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
     <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
-    <script src="../../static/js/echarts.min.js" th:src="@{../../js/echarts.min.js}"></script>
+    <script src="../../static/js/echarts.min.js" th:src="@{../../static/js/echarts.min.js}"></script>
     <title>Member Analysis</title>
 </head>
 <body>
@@ -133,7 +133,7 @@
         legend: {
             orient: 'vertical',
             x: 'left',
-            data: ['Member Card', 'Cash', 'Credit Card']
+            data: []
         },
         series: [
             {
@@ -167,26 +167,37 @@
             }
         ]
     };
-    activityChart.setOption(activityOption);
+
     $.ajax({
         url: '/member/activityDistribution',
         data: '',
         dataType: 'json',
         success: function (data) {
-
+            // alert(JSON.stringify(data));
+            // console.log(data);
+            if (data.result) {
+                activityOption.series[0].data = [];
+                for (var i = 0; i != data.numberList.length; i++) {
+                    var object = {value: data.numberList[i], name: data.activityList[i]};
+                    activityOption.series[0].data.push(object);
+                }
+            }
+            activityChart.setOption(activityOption);
+            // alert(venueOption.series[0].data);
+            console.log(activityOption.series[0].data);
         }
     });
 
     var consumptionChart = echarts.init(document.getElementById('consumption'));
     var consumptionOption = {
-        tooltip : {
+        tooltip: {
             trigger: 'axis',
-            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
             }
         },
         legend: {
-            data:['预订金额','退订金额','完成金额']
+            data: ['消费金额']
         },
         grid: {
             left: '10%',
@@ -194,48 +205,52 @@
             bottom: '10%',
             containLabel: true
         },
-        xAxis : [
+        xAxis: [
             {
                 name: 'Time',
-                type : 'category',
-                data : ["1","2","3","4","5","6","7","8","9","10","11","12",]
+                type: 'category',
+                data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",]
             }
         ],
-        yAxis : [
+        yAxis: [
             {
-                name: 'Income',
-                type : 'value'
+                name: 'Consumption',
+                type: 'value'
             }
         ],
-        series : [
+        series: [
             {
-                name:'预订金额',
-                type:'bar',
+                name: '预订金额',
+                type: 'bar',
                 stack: 'Day Income',
-                data:[620, 732, 701, 734, 1090, 1130, 1120, 732, 701, 734, 1090, 1130]
-            },
-            {
-                name:'退订金额',
-                type:'bar',
-                stack: 'Day Income',
-                data:[120, 132, 101, 134, 290, 230, 220, 132, 101, 134, 290, 230]
-            },
-            {
-                name:'完成金额',
-                type:'bar',
-                stack: 'Day Income',
-                data:[60, 72, 71, 74, 190, 130, 110, 72, 71, 74, 190, 130]
+                data: [620, 732, 701, 734, 1090, 1130, 1120, 732, 701, 734, 1090, 1130]
             }
         ]
     };
 
-    consumptionChart.setOption(consumptionOption);
+    // consumptionChart.setOption(consumptionOption);
     $.ajax({
         url: '/member/consumptionDistribution',
         data: '',
         dataType: 'json',
         success: function (data) {
-
+            // alert(JSON.stringify(data));
+            // console.log(data);
+            if (data.result) {
+                consumptionOption.xAxis[0].data = Object.keys(data.monthList).map(function (k) {
+                    return data.monthList[k]
+                });
+                // venueOption.xAxis[0].data = Array.from(data.monthList);
+                consumptionOption.series[0].data = Array.from(data.moneyList);
+                // venueOption.xAxis[0].data = Object.keys(data.venueNameList).map(function(k) { return data.venueNameList[k] });
+                // venueOption.series[0].data = Array.from(data.realConsumption);
+                // venueOption.series[1].data = Array.from(data.memberDiscount);
+                //
+                //
+                consumptionChart.setOption(consumptionOption);
+            }
+            // alert(JSON.stringify(venueOption.xAxis[0].data));
+            // alert(JSON.stringify(venueOption.series[0].data));
         }
     });
 
@@ -248,7 +263,7 @@
         legend: {
             orient: 'vertical',
             x: 'left',
-            data: ['Member Card', 'Cash', 'Credit Card']
+            data: []
         },
         series: [
             {
@@ -282,13 +297,25 @@
             }
         ]
     };
-    venueChart.setOption(venueOption);
+
     $.ajax({
         url: '/member/venueDistribution',
         data: '',
         dataType: 'json',
         success: function (data) {
+            // alert(JSON.stringify(data));
+            // console.log(data);
+            if (data.result) {
+                venueOption.series[0].data = [];
+                for (var i = 0; i != data.numberList.length; i++) {
+                    var object = {value: data.numberList[i], name: data.venueList[i]};
 
+                    venueOption.series[0].data.push(object);
+                }
+            }
+            venueChart.setOption(venueOption);
+            // alert(venueOption.series[0].data);
+            console.log(venueOption.series[0].data)
         }
     });
 </script>

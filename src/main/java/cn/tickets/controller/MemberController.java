@@ -213,38 +213,26 @@ public class MemberController {
     //以下是管理信息系统作业新增代码
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int mid) {
-        model.addAttribute("memberAnalysis",memberService.analysis(model,mid));
+        model.addAttribute("memberAnalysis",memberService.analysis(mid));
         return "member/analysis";
     }
 
     @RequestMapping("/activityDistribution")
     @ResponseBody
-    public Map<String,Object> activityDistribution(){
-
-
-        Map<String, Object> result = new TreeMap<>();
-        result.put(Default.HTTP_RESULT, true);
-        return result;
+    public Map<String,Object> activityDistribution(@SessionAttribute("userID") int mid){
+        return memberService.activityDistribution(mid);
     }
 
     @RequestMapping("/consumptionDistribution")
     @ResponseBody
-    public Map<String,Object> consumptionDistribution(){
-
-
-        Map<String, Object> result = new TreeMap<>();
-        result.put(Default.HTTP_RESULT, true);
-        return result;
+    public Map<String,Object> consumptionDistribution(@SessionAttribute("userID") int mid){
+        return memberService.consumptionDistribution(mid);
     }
 
     @RequestMapping("/venueDistribution")
     @ResponseBody
-    public Map<String,Object> venueDistribution(){
-
-
-        Map<String, Object> result = new TreeMap<>();
-        result.put(Default.HTTP_RESULT, true);
-        return result;
+    public Map<String,Object> venueDistribution(@SessionAttribute("userID") int mid){
+        return memberService.venueDistribution(mid);
     }
 
 }

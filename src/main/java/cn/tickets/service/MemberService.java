@@ -27,6 +27,9 @@ public interface MemberService {
     boolean unSubscribe(int cid);
 
     //以下是管理信息系统新增代码
-    MemberAnalysisVO analysis(Model model, int mid);
+    MemberAnalysisVO analysis(int mid);
 
+    Map<String,Object> activityDistribution(int mid);
+    Map<String,Object> consumptionDistribution(int mid);
+    Map<String,Object> venueDistribution(int mid);
 }

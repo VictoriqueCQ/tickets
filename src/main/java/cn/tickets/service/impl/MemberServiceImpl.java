@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -197,7 +198,7 @@ public class MemberServiceImpl implements MemberService {
 
     //以下是管理信息系统作业新增代码
     @Override
-    public MemberAnalysisVO analysis(Model model, int mid) {
+    public MemberAnalysisVO analysis(int mid) {
         MemberAnalysisVO memberAnalysisVO = new MemberAnalysisVO();
         List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
 //        System.err.println(listLastYear.toString());
@@ -213,7 +214,7 @@ public class MemberServiceImpl implements MemberService {
             }
 
             averagePriceLastMonth = allPriceLastMonth / listLastMonth.size() + "元/月";
-        }else{
+        } else {
             averagePriceLastMonth = "0元/月";
         }
         memberAnalysisVO.setAveragePerMonth(averagePriceLastMonth);
@@ -224,7 +225,7 @@ public class MemberServiceImpl implements MemberService {
         List<String> venueKeyList = new ArrayList<>();
         String refundRatio = "";
         String orderRatio = "";
-        if(listLastYear.size()>0){
+        if (listLastYear.size() > 0) {
             TreeSet<String> activitySet = new TreeSet<>();
             TreeSet<Integer> venueIdSet = new TreeSet<>();
             int allPriceLastYear = 0;
@@ -239,7 +240,6 @@ public class MemberServiceImpl implements MemberService {
             }
             System.err.println("退单次数" + refundTime);
             averagePriceLastYear = allPriceLastYear / listLastYear.size() + "元/月";
-
 
 
             //退单率计算
@@ -301,7 +301,7 @@ public class MemberServiceImpl implements MemberService {
                 }
             }
 
-        }else{
+        } else {
             averagePriceLastYear = "0元/月";
             activityKeyList.add("无");
             venueKeyList.add("无");
@@ -318,6 +318,127 @@ public class MemberServiceImpl implements MemberService {
         memberAnalysisVO.setOrderRatio(orderRatio);
 
         return memberAnalysisVO;
+    }
+
+    @Override
+    public Map<String, Object> activityDistribution(int mid) {
+        Map<String, Object> result = new TreeMap<>();
+        List<String> activityList = new ArrayList<>();
+        List<Integer> numberList = new ArrayList<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
+        if (listLastYear.size() > 0) {
+            TreeSet<String> activitySet = new TreeSet<>();
+            for (ConsumptionEntity consumptionEntity : listLastYear) {
+                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+            }
+            //活动集合
+            TreeMap<String, Integer> activityMap = new TreeMap<>();
+            for (String activity : activitySet) {
+                int num = 0;
+                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                    if (consumptionEntity.getType().equals(activity)) {
+                        num += 1;
+                    }
+                }
+                //获得所有活动参加的次数
+                activityMap.put(activity, num);
+            }
+            for (String getKey : activityMap.keySet()) {
+                activityList.add(getKey);
+                numberList.add(activityMap.get(getKey));
+            }
+        } else {
+            activityList.add("无");
+            numberList.add(0);
+        }
+        result.put("activityList", activityList);
+        result.put("numberList", numberList);
+        result.put(Default.HTTP_RESULT, true);
+        System.err.println("activityDistribution:"+result);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> consumptionDistribution(int mid) {
+        Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastMonth(mid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+        int[] moneyArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        List<Integer> moneyList = new ArrayList<>(12);
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 12; i++) {
+
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < monthList.size(); i++) {
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    moneyArray[i] += consumptionEntity.getAprice();
+                }
+            }
+        }
+//        System.err.println(moneyArray.toString());
+        for(int i = 0;i<moneyArray.length;i++){
+            moneyList.add(moneyArray[i]);
+        }
+        result.put("monthList",monthList);
+        result.put("moneyList",moneyList);
+        result.put(Default.HTTP_RESULT,true);
+        System.err.println("consumptionDistribution:"+result);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> venueDistribution(int mid) {
+        Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastMonth(mid);
+        List<String> venueList = new ArrayList<>();
+        List<Integer> numberList = new ArrayList<>();
+        if (listLastYear.size() > 0) {
+            TreeSet<Integer> venueIdSet = new TreeSet<>();
+            for (ConsumptionEntity consumptionEntity : listLastYear) {
+                venueIdSet.add(consumptionEntity.getVid());//获得所有场馆id的集合
+            }
+            //场馆集合
+            TreeMap<Integer, Integer> venueMap = new TreeMap<>();
+            for (Integer venueId : venueIdSet) {
+                int num = 0;
+                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                    if (consumptionEntity.getVid() == venueId) {
+                        num += 1;
+                    }
+                }
+                //获得所有场馆去的次数集合
+                venueMap.put(venueId, num);
+            }
+            for (int getKey : venueMap.keySet()) {
+                venueList.add(venueRepository.findOne(getKey).getName());
+                numberList.add(venueMap.get(getKey));
+            }
+        } else {
+            venueList.add("无");
+            numberList.add(0);
+        }
+        result.put("venueList", venueList);
+        result.put("numberList", numberList);
+        result.put(Default.HTTP_RESULT, true);
+        System.err.println("venueDistribution:"+result);
+        return result;
     }
 
 }
