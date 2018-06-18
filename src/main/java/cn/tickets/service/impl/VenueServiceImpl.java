@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Transactional
@@ -116,7 +114,90 @@ public class VenueServiceImpl implements VenueService {
 
 
     @Override
-    public String analysis(Model model, int vid) {
-        return null;
+    public List<String> analysis(Model model, int vid) {
+        List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        List<String> activityType = new ArrayList<>();
+        for(ConsumptionEntity consumptionEntity:venueConsumptionListLastYear){
+            String activityName = consumptionEntity.getType();
+            if(!activityType.contains(activityName)){
+                activityType.add(activityName);
+            }
+        }
+        return activityType;
+    }
+
+    @Override
+    public Map<String, Object> memberNumber(int vid) {
+        Map<String, Object> result = new TreeMap<>();
+
+        List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        List<Integer> memberNumberList = new ArrayList<>(12);
+        Map<String,Set<Integer>> memberChangeList = new TreeMap<>();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+
+        c2.add(Calendar.MONTH, 1);
+
+        for (int i = 0; i < 12; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            memberChangeList.put(m.toString(),new TreeSet<>());
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+        for (ConsumptionEntity consumptionEntity : venueConsumptionListLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < monthList.size(); i++) {
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    memberChangeList.get(monthList.get(i)).add(consumptionEntity.getMid());
+                }
+            }
+        }
+        for(int i = 0;i<monthList.size();i++){
+            memberNumberList.add(memberChangeList.get(monthList.get(i)).size());
+        }
+        result.put("monthList",monthList);
+        result.put("memberNumberList",memberNumberList);
+
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> profitChange(int vid) {
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> unitPriceChange(int vid) {
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> profitDistribution(int vid) {
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> activityDistribution(int vid) {
+        Map<String, Object> result = new TreeMap<>();
+        result.put(Default.HTTP_RESULT, true);
+        return result;
     }
 }

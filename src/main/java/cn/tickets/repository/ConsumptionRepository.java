@@ -26,4 +26,8 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
     //过去一年某会员消费记录
     @Query(nativeQuery = true,value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
     List<ConsumptionEntity> consumptionsLastYear(@Param("mid")int mid);
+
+    //过去一年某场馆消费记录
+    @Query(nativeQuery = true,value = "select * from consumption where vid=:vid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> venueConsumptionLastYear(@Param("vid")int vid);
 }

@@ -124,4 +124,34 @@ public class VenueController {
         return "venue/analysis";
     }
 
+    @RequestMapping("/memberNumber")
+    @ResponseBody
+    public Map<String, Object> memberNumber(@SessionAttribute("userID") int vid) {
+        return venueService.memberNumber(vid);
+    }
+
+    @RequestMapping("/profitChange")
+    @ResponseBody
+    public Map<String, Object> profitChange(@SessionAttribute("userID") int vid) {
+        return venueService.profitChange(vid);
+    }
+
+    @RequestMapping("/unitPriceChange")
+    @ResponseBody
+    public Map<String, Object> unitPriceChange(@SessionAttribute("userID") int vid) {
+        return venueService.unitPriceChange(vid);
+    }
+
+    @RequestMapping("/profitDistribution")
+    @ResponseBody
+    public Map<String, Object> profitDistribution(@SessionAttribute("userID") int vid) {
+        return venueService.profitDistribution(vid);
+    }
+
+    @RequestMapping("/activityDistribution")
+    @ResponseBody
+    public Map<String, Object> activityDistribution(@SessionAttribute("userID") int vid) {
+        return venueService.activityDistribution(vid);
+    }
+
 }
