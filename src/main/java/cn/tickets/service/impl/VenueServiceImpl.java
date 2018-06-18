@@ -272,6 +272,7 @@ public class VenueServiceImpl implements VenueService {
             activityList.add("无");
             numberList.add(0);
         }
+        
         result.put("activityList", activityList);
         result.put("numberList", numberList);
         result.put(Default.HTTP_RESULT, true);
