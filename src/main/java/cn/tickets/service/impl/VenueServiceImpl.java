@@ -183,6 +183,33 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public Map<String, Object> unitPriceChange(int vid) {
         Map<String, Object> result = new TreeMap<>();
+
+        List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+//        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//        List<Integer> memberNumberList = new ArrayList<>(12);
+//        Map<String,Set<Integer>> memberChangeList = new TreeMap<>();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+
+        c2.add(Calendar.MONTH, 1);
+
+        for (int i = 0; i < 12; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+//            memberChangeList.put(m.toString(),new TreeSet<>());
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -190,6 +217,26 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public Map<String, Object> profitDistribution(int vid) {
         Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        List<String> activityName = new ArrayList<>();
+        for(ConsumptionEntity consumptionEntity:listLastYear){
+            String type = consumptionEntity.getType();
+            if(!activityName.contains(type)){
+                activityName.add(type);
+            }
+        }
+        List<Integer> profitSum = new ArrayList<>();
+        for(String type:activityName){
+            int sum = 0;
+            for(ConsumptionEntity consumptionEntity:listLastYear){
+                if(consumptionEntity.getType().equals(type)){
+                    sum+=consumptionEntity.getAprice();
+                }
+            }
+            profitSum.add(sum);
+        }
+        result.put("ActivityType",activityName);
+        result.put("ProfitSum",profitSum);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -197,6 +244,36 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public Map<String, Object> activityDistribution(int vid) {
         Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        List<String> activityList = new ArrayList<>();
+        List<Integer> numberList = new ArrayList<>();
+        if (listLastYear.size() > 0) {
+            TreeSet<String> activitySet = new TreeSet<>();
+            for (ConsumptionEntity consumptionEntity : listLastYear) {
+                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+            }
+            //活动集合
+            TreeMap<String, Integer> activityMap = new TreeMap<>();
+            for (String activity : activitySet) {
+                int num = 0;
+                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                    if (consumptionEntity.getType().equals(activity)) {
+                        num += 1;
+                    }
+                }
+                //获得所有活动参加的次数
+                activityMap.put(activity, num);
+            }
+            for (String getKey : activityMap.keySet()) {
+                activityList.add(getKey);
+                numberList.add(activityMap.get(getKey));
+            }
+        } else {
+            activityList.add("无");
+            numberList.add(0);
+        }
+        result.put("activityList", activityList);
+        result.put("numberList", numberList);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
