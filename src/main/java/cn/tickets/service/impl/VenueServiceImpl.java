@@ -124,11 +124,8 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public Map<String, Object> memberNumber(int vid) {
         Map<String, Object> result = new TreeMap<>();
-
+        List<Integer> memberNumberList = new ArrayList<>();
         List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
-        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        List<Integer> memberNumberList = new ArrayList<>(12);
-        Map<String, Set<Integer>> memberChangeList = new TreeMap<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         List<String> monthList = new ArrayList<>(12);
@@ -143,7 +140,6 @@ public class VenueServiceImpl implements VenueService {
             Date m2 = c2.getTime();
             monthList.add(sdf.format(m));
             monthList2.add(sdf.format(m2));
-            memberChangeList.put(m.toString(), new TreeSet<>());
             c.add(Calendar.MONTH, -1);
             c2.add(Calendar.MONTH, -1);
         }
@@ -151,13 +147,21 @@ public class VenueServiceImpl implements VenueService {
             String orderdate = consumptionEntity.getOrderdate().toString();
             for (int i = 0; i < monthList.size(); i++) {
                 if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
-                    memberChangeList.get(monthList.get(i)).add(consumptionEntity.getMid());
+
                 }
             }
         }
-        for (int i = 0; i < monthList.size(); i++) {
-            memberNumberList.add(memberChangeList.get(monthList.get(i)).size());
+        for(int i = 0;i<monthList.size();i++){
+            HashSet<Integer> midSet = new HashSet<>();
+            for(ConsumptionEntity consumptionEntity:venueConsumptionListLastYear){
+                String orderdate = consumptionEntity.getOrderdate().toString();
+                if(orderdate.compareTo(monthList.get(i))>0&&orderdate.compareTo(monthList2.get(i))<0){
+                    midSet.add(consumptionEntity.getMid());
+                }
+            }
+            memberNumberList.add(midSet.size());
         }
+
         result.put("monthList", monthList);
         result.put("memberNumberList", memberNumberList);
 
@@ -212,7 +216,13 @@ public class VenueServiceImpl implements VenueService {
             }
         }
         for (int i = 0; i < monthList.size(); i++) {
-            double unitPrice = priceSumArray[i] / seatSumArray[i];
+            double unitPrice;
+            if (seatSumArray[i] != 0) {
+                unitPrice = priceSumArray[i] / seatSumArray[i];
+            }else{
+                unitPrice = 0.0;
+            }
+
             DecimalFormat df = new DecimalFormat("0.0");
             Double unitPriceDouble = Double.parseDouble(df.format(unitPrice));
             unitPriceList.add(unitPriceDouble);
@@ -273,17 +283,17 @@ public class VenueServiceImpl implements VenueService {
         }
         List<List<Integer>> profitPerMonth = new ArrayList<>();
 
-        for(int i = 0; i < activityName.size(); i++){
+        for (int i = 0; i < activityName.size(); i++) {
             List<Integer> profitPerActivity = new ArrayList<>();
-            for(int j = 0;j<profitPerMonthArray[i].length;j++){
+            for (int j = 0; j < profitPerMonthArray[i].length; j++) {
                 profitPerActivity.add(profitPerMonthArray[i][j]);
             }
             profitPerMonth.add(profitPerActivity);
         }
 
-        result.put("activityType",activityName);
-        result.put("monthList",monthList);
-        result.put("profitPerMonth",profitPerMonth);
+        result.put("activityType", activityName);
+        result.put("monthList", monthList);
+        result.put("profitPerMonth", profitPerMonth);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -338,17 +348,17 @@ public class VenueServiceImpl implements VenueService {
         }
 
         List<List<Integer>> numberPerMonth = new ArrayList<>();
-        for(int i = 0; i < activityName.size(); i++){
+        for (int i = 0; i < activityName.size(); i++) {
             List<Integer> numberPerActivity = new ArrayList<>();
-            for(int j = 0;j<numberPerMonthArray[i].length;j++){
+            for (int j = 0; j < numberPerMonthArray[i].length; j++) {
                 numberPerActivity.add(numberPerMonthArray[i][j]);
             }
             numberPerMonth.add(numberPerActivity);
         }
 
-        result.put("activityType",activityName);
-        result.put("monthList",monthList);
-        result.put("numberPerMonth",numberPerMonth);
+        result.put("activityType", activityName);
+        result.put("monthList", monthList);
+        result.put("numberPerMonth", numberPerMonth);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }

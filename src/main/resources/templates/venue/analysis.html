@@ -56,7 +56,7 @@
 
 <div class="mainpage">
     <div class="container-fluid">
-        <div class="col-md-12" style="height: 300px;">
+        <div class="col-md-12">
             <div class="col-md-6">
                 <div class="panel panel-info">
                     <div class="panel-heading">具体活动</div>
@@ -68,23 +68,23 @@
                     </table>
                 </div>
             </div>
-            <div id="memberNumber" class="col-md-6">
+            <div id="memberNumber" style="width: 600px;height:300px;" class="col-md-6">
                 会员数量折线图
             </div>
         </div>
-        <div class="col-md-12" style="height: 300px;">
-            <div id="profitChange" class="col-md-6">
+        <div class="col-md-12">
+            <div id="profitChange" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年不同活动收益变化（每个季度统计一次）直方图
             </div>
-            <div id="unitPriceChange" class="col-md-6">
+            <div id="unitPriceChange" style="width: 600px;height: 300px;" class="col-md-6">
                 会员订单单价变化折线图
             </div>
         </div>
-        <div class="col-md-12" style="height: 300px;">
-            <div id="profitDistribution" class="col-md-6">
+        <div class="col-md-12">
+            <div id="profitDistribution" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年收益分布扇形图
             </div>
-            <div id="activityDistribution" class="col-md-6">
+            <div id="activityDistribution" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年会员订票活动类型分布扇形图
             </div>
         </div>
@@ -94,7 +94,7 @@
 <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
-    var memberNumberChart = echarts.init(document.getElementById("memberNumber"));
+    var memberNumberChart = echarts.init(document.getElementById('memberNumber'));
     var memberNumberOption = {
         xAxis: {
             type: 'category',
@@ -114,11 +114,11 @@
         dataType: 'json',
         success: function (data) {
             if (data.result) {
-                memberNumberOption.xAxis[0].data = Array.from(data.monthList);
+                memberNumberOption.xAxis.data = Array.from(data.monthList);
                 memberNumberOption.series[0].data = Array.from(data.memberNumberList);
+                alert(memberNumberOption.xAxis.data);
+                alert(memberNumberOption.series[0].data);
             }
-            console.log(memberNumberOption.xAxis[0].data);
-            console.log(memberNumberOption.series[0].data);
             memberNumberChart.setOption(memberNumberOption);
         }
     });
