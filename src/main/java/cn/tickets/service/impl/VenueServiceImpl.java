@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -25,17 +26,15 @@ public class VenueServiceImpl implements VenueService {
 
 
     @Autowired
-    public VenueServiceImpl(VenueRepository venueRepository,ConsumptionRepository consumptionRepository){
+    public VenueServiceImpl(VenueRepository venueRepository, ConsumptionRepository consumptionRepository) {
         this.venueRepository = venueRepository;
         this.consumptionRepository = consumptionRepository;
     }
 
 
-
-
     @Override
-    public Map<String,Object> updateVenueInfo(int vid, String location, int fsnumber, int bsnumber,String name){
-        Map<String,Object> result = new TreeMap<>();
+    public Map<String, Object> updateVenueInfo(int vid, String location, int fsnumber, int bsnumber, String name) {
+        Map<String, Object> result = new TreeMap<>();
 
         VenueEntity venueEntity = venueRepository.findOne(vid);
         venueEntity.setName(name);
@@ -53,8 +52,6 @@ public class VenueServiceImpl implements VenueService {
     }
 
 
-
-
     public String statistics(Model model, int vid) {
         System.err.println(vid);
         List<ConsumptionEntity> bookConsumptionEntities = consumptionRepository.findByVidAndPredefine(vid, 1);//预订订单
@@ -66,7 +63,6 @@ public class VenueServiceImpl implements VenueService {
         model.addAttribute("statistics", buildVenueStatisticsVO(bookConsumptionEntities, unsubscribeConsumptionEntities, completeConsumptionEntities));
         return "venue/statistics";
     }
-
 
 
     public VenueStatisticsVO buildVenueStatisticsVO(
@@ -112,14 +108,13 @@ public class VenueServiceImpl implements VenueService {
     }
 
 
-
     @Override
     public List<String> analysis(Model model, int vid) {
         List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
         List<String> activityType = new ArrayList<>();
-        for(ConsumptionEntity consumptionEntity:venueConsumptionListLastYear){
+        for (ConsumptionEntity consumptionEntity : venueConsumptionListLastYear) {
             String activityName = consumptionEntity.getType();
-            if(!activityType.contains(activityName)){
+            if (!activityType.contains(activityName)) {
                 activityType.add(activityName);
             }
         }
@@ -131,27 +126,24 @@ public class VenueServiceImpl implements VenueService {
         Map<String, Object> result = new TreeMap<>();
 
         List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        List<Integer> memberNumberList = new ArrayList<>(12);
+        Map<String, Set<Integer>> memberChangeList = new TreeMap<>();
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         List<String> monthList = new ArrayList<>(12);
         List<String> monthList2 = new ArrayList<>(12);
-        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        List<Integer> memberNumberList = new ArrayList<>(12);
-        Map<String,Set<Integer>> memberChangeList = new TreeMap<>();
-
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
-
         Calendar c2 = Calendar.getInstance();
         c2.setTime(new Date());
-
         c2.add(Calendar.MONTH, 1);
-
         for (int i = 0; i < 12; i++) {
             Date m = c.getTime();
             Date m2 = c2.getTime();
             monthList.add(sdf.format(m));
             monthList2.add(sdf.format(m2));
-            memberChangeList.put(m.toString(),new TreeSet<>());
+            memberChangeList.put(m.toString(), new TreeSet<>());
             c.add(Calendar.MONTH, -1);
             c2.add(Calendar.MONTH, -1);
         }
@@ -163,11 +155,11 @@ public class VenueServiceImpl implements VenueService {
                 }
             }
         }
-        for(int i = 0;i<monthList.size();i++){
+        for (int i = 0; i < monthList.size(); i++) {
             memberNumberList.add(memberChangeList.get(monthList.get(i)).size());
         }
-        result.put("monthList",monthList);
-        result.put("memberNumberList",memberNumberList);
+        result.put("monthList", monthList);
+        result.put("memberNumberList", memberNumberList);
 
         result.put(Default.HTTP_RESULT, true);
         return result;
@@ -185,31 +177,48 @@ public class VenueServiceImpl implements VenueService {
         Map<String, Object> result = new TreeMap<>();
 
         List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        List<String> monthList = new ArrayList<>(12);
-        List<String> monthList2 = new ArrayList<>(12);
+        int[] priceSumArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int[] seatSumArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        List<Double> unitPriceList = new ArrayList<>();
 //        int[] memberNumberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //        List<Integer> memberNumberList = new ArrayList<>(12);
 //        Map<String,Set<Integer>> memberChangeList = new TreeMap<>();
 
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
-
         Calendar c2 = Calendar.getInstance();
         c2.setTime(new Date());
-
         c2.add(Calendar.MONTH, 1);
-
         for (int i = 0; i < 12; i++) {
             Date m = c.getTime();
             Date m2 = c2.getTime();
             monthList.add(sdf.format(m));
             monthList2.add(sdf.format(m2));
-//            memberChangeList.put(m.toString(),new TreeSet<>());
             c.add(Calendar.MONTH, -1);
             c2.add(Calendar.MONTH, -1);
         }
 
+        for (ConsumptionEntity consumptionEntity : venueConsumptionListLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < monthList.size(); i++) {
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    priceSumArray[i] += consumptionEntity.getAprice();
+                    seatSumArray[i] += consumptionEntity.getFsnumber() + consumptionEntity.getBsnumber();
+                }
+            }
+        }
+        for (int i = 0; i < monthList.size(); i++) {
+            double unitPrice = priceSumArray[i] / seatSumArray[i];
+            DecimalFormat df = new DecimalFormat("0.0");
+            Double unitPriceDouble = Double.parseDouble(df.format(unitPrice));
+            unitPriceList.add(unitPriceDouble);
+        }
+        result.put("monthList", monthList);
+        result.put("unitPrice", unitPriceList);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -219,24 +228,62 @@ public class VenueServiceImpl implements VenueService {
         Map<String, Object> result = new TreeMap<>();
         List<ConsumptionEntity> listLastYear = consumptionRepository.venueConsumptionLastYear(vid);
         List<String> activityName = new ArrayList<>();
-        for(ConsumptionEntity consumptionEntity:listLastYear){
-            String type = consumptionEntity.getType();
-            if(!activityName.contains(type)){
-                activityName.add(type);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 12; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+
+        //获得所有活动名
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String activityType = consumptionEntity.getType();
+            if (!activityName.contains(activityType)) {
+                activityName.add(activityType);
             }
         }
-        List<Integer> profitSum = new ArrayList<>();
-        for(String type:activityName){
-            int sum = 0;
-            for(ConsumptionEntity consumptionEntity:listLastYear){
-                if(consumptionEntity.getType().equals(type)){
-                    sum+=consumptionEntity.getAprice();
+        int[][] profitPerMonthArray = new int[activityName.size()][12];
+        for (int i = 0; i < activityName.size(); i++) {
+            for (int j = 0; j < 12; j++) {
+                profitPerMonthArray[i][j] = 0;
+            }
+        }
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < activityName.size(); i++) {
+                if (activityName.get(i).equals(consumptionEntity.getType())) {
+                    for (int j = 0; j < monthList.size(); j++) {
+                        if (orderdate.compareTo(monthList.get(j)) > 0 && orderdate.compareTo(monthList2.get(j)) < 0) {
+                            profitPerMonthArray[i][j] += consumptionEntity.getAprice();
+                        }
+                    }
                 }
             }
-            profitSum.add(sum);
         }
-        result.put("ActivityType",activityName);
-        result.put("ProfitSum",profitSum);
+        List<List<Integer>> profitPerMonth = new ArrayList<>();
+
+        for(int i = 0; i < activityName.size(); i++){
+            List<Integer> profitPerActivity = new ArrayList<>();
+            for(int j = 0;j<profitPerMonthArray[i].length;j++){
+                profitPerActivity.add(profitPerMonthArray[i][j]);
+            }
+            profitPerMonth.add(profitPerActivity);
+        }
+
+        result.put("activityType",activityName);
+        result.put("monthList",monthList);
+        result.put("profitPerMonth",profitPerMonth);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -245,36 +292,63 @@ public class VenueServiceImpl implements VenueService {
     public Map<String, Object> activityDistribution(int vid) {
         Map<String, Object> result = new TreeMap<>();
         List<ConsumptionEntity> listLastYear = consumptionRepository.venueConsumptionLastYear(vid);
-        List<String> activityList = new ArrayList<>();
-        List<Integer> numberList = new ArrayList<>();
-        if (listLastYear.size() > 0) {
-            TreeSet<String> activitySet = new TreeSet<>();
-            for (ConsumptionEntity consumptionEntity : listLastYear) {
-                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+        List<String> activityName = new ArrayList<>();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 12; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+
+        //获得所有活动名
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String activityType = consumptionEntity.getType();
+            if (!activityName.contains(activityType)) {
+                activityName.add(activityType);
             }
-            //活动集合
-            TreeMap<String, Integer> activityMap = new TreeMap<>();
-            for (String activity : activitySet) {
-                int num = 0;
-                for (ConsumptionEntity consumptionEntity : listLastYear) {
-                    if (consumptionEntity.getType().equals(activity)) {
-                        num += 1;
+        }
+        int[][] numberPerMonthArray = new int[activityName.size()][12];
+        for (int i = 0; i < activityName.size(); i++) {
+            for (int j = 0; j < 12; j++) {
+                numberPerMonthArray[i][j] = 0;
+            }
+        }
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < activityName.size(); i++) {
+                if (activityName.get(i).equals(consumptionEntity.getType())) {
+                    for (int j = 0; j < monthList.size(); j++) {
+                        if (orderdate.compareTo(monthList.get(j)) > 0 && orderdate.compareTo(monthList2.get(j)) < 0) {
+                            numberPerMonthArray[i][j] += 1;
+                        }
                     }
                 }
-                //获得所有活动参加的次数
-                activityMap.put(activity, num);
             }
-            for (String getKey : activityMap.keySet()) {
-                activityList.add(getKey);
-                numberList.add(activityMap.get(getKey));
-            }
-        } else {
-            activityList.add("无");
-            numberList.add(0);
         }
-        
-        result.put("activityList", activityList);
-        result.put("numberList", numberList);
+
+        List<List<Integer>> numberPerMonth = new ArrayList<>();
+        for(int i = 0; i < activityName.size(); i++){
+            List<Integer> numberPerActivity = new ArrayList<>();
+            for(int j = 0;j<numberPerMonthArray[i].length;j++){
+                numberPerActivity.add(numberPerMonthArray[i][j]);
+            }
+            numberPerMonth.add(numberPerActivity);
+        }
+
+        result.put("activityType",activityName);
+        result.put("monthList",monthList);
+        result.put("numberPerMonth",numberPerMonth);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }

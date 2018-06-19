@@ -115,8 +115,10 @@
             success: function (data) {
                 if (data.result) {
                     memberNumberOption.xAxis[0].data = Array.from(data.monthList);
-                    memberNumberOption.series[0].data = Array.from(data.numberList);
+                    memberNumberOption.series[0].data = Array.from(data.memberNumberList);
                 }
+                console.log(memberNumberOption.xAxis[0].data);
+                console.log(memberNumberOption.series[0].data);
                 memberNumberChart.setOption(memberNumberOption);
             }
         });
@@ -227,8 +229,10 @@
             success: function (data) {
                 if (data.result) {
                     unitPriceChangeOption.xAxis[0].data = Array.from(data.monthList);
-                    unitPriceChangeOption.series[0].data = Array.from(data.numberList);
+                    unitPriceChangeOption.series[0].data = Array.from(data.unitPrice);
                 }
+                console.log(unitPriceChangeOption.xAxis[0].data);
+                console.log(unitPriceChangeOption.series[0].data);
                 unitPriceChangeChart.setOption(unitPriceChangeOption);
             }
         });
