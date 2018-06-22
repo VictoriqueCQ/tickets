@@ -57,51 +57,85 @@
 <div class="mainpage">
     <div class="container-fluid">
         <div class="col-md-12">
-            <div class="col-md-6">
+
+            <div class="col-md-6" style="width: 600px;height:300px;">
                 <div class="panel panel-info">
                     <div class="panel-heading">具体活动</div>
                     <table class="table table-hover" id="frontTable">
                         <tr th:each="activity:${venueAnalysis}">
                             <td class="activityName" th:text="${activity}" style="width: 66%;">活动a</td>
-                            <td style="width: 34%">查看详情</td>
+                            <td style="width: 34%">
+                                <button class="details">查看详情</button>
+                            </td>
                         </tr>
                     </table>
                 </div>
             </div>
+
             <div id="memberNumber" style="width: 600px;height:300px;" class="col-md-6">
                 会员数量折线图
             </div>
+
         </div>
         <div class="col-md-12">
-            <div id="profitChange" style="width: 600px;height: 300px;" class="col-md-6">
+
+            <div id="profitAverage" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年不同活动收益变化（每个季度统计一次）直方图
             </div>
+
             <div id="unitPriceChange" style="width: 600px;height: 300px;" class="col-md-6">
                 会员订单单价变化折线图
             </div>
+
         </div>
         <div class="col-md-12">
+
             <div id="profitDistribution" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年收益分布扇形图
             </div>
+
             <div id="activityDistribution" style="width: 600px;height: 300px;" class="col-md-6">
                 过去一年会员订票活动类型分布扇形图
             </div>
+
         </div>
     </div>
 
 </div>
-<script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
+    $('.details').on('click', function () {
+        var type = $(this).parents("tr").find(".activityName").text();
+        var inputs = {type:type};
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/venue/getActivityType",
+            data: inputs,
+            dataType: "json",
+            success: function (data) {
+                window.location.href = "details.html";
+            }
+        })
+
+    });
+
     var memberNumberChart = echarts.init(document.getElementById('memberNumber'));
     var memberNumberOption = {
+        title: {
+            text: '场馆活跃会员数量变化'
+        },
         xAxis: {
             type: 'category',
             data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 人次'
+            }
         },
         series: [{
             data: [820, 932, 901, 934, 1290, 1330, 1320],
@@ -116,15 +150,16 @@
             if (data.result) {
                 memberNumberOption.xAxis.data = Array.from(data.monthList);
                 memberNumberOption.series[0].data = Array.from(data.memberNumberList);
-                alert(memberNumberOption.xAxis.data);
-                alert(memberNumberOption.series[0].data);
             }
             memberNumberChart.setOption(memberNumberOption);
         }
     });
 
-    var profitChangeChart = echarts.init(document.getElementById("profitChange"));
-    var profitChangeOption = {
+    var profitAverageChart = echarts.init(document.getElementById("profitAverage"));
+    var profitAverageOption = {
+        title: {
+            text: '场馆收益变化'
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {
@@ -133,17 +168,6 @@
                     color: '#999'
                 }
             }
-        },
-        toolbox: {
-            feature: {
-                dataView: {show: true, readOnly: false},
-                magicType: {show: true, type: ['line', 'bar']},
-                restore: {show: true},
-                saveAsImage: {show: true}
-            }
-        },
-        legend: {
-            data: ['蒸发量', '降水量', '平均温度']
         },
         xAxis: [
             {
@@ -157,65 +181,48 @@
         yAxis: [
             {
                 type: 'value',
-                name: '水量',
+                name: '收益（单位：元）',
                 min: 0,
-                max: 250,
-                interval: 50,
                 axisLabel: {
-                    formatter: '{value} ml'
-                }
-            },
-            {
-                type: 'value',
-                name: '温度',
-                min: 0,
-                max: 25,
-                interval: 5,
-                axisLabel: {
-                    formatter: '{value} °C'
+                    formatter: '{value} 元'
                 }
             }
         ],
         series: [
             {
-                name: '蒸发量',
                 type: 'bar',
                 data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
-            },
-            {
-                name: '降水量',
-                type: 'bar',
-                data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-            },
-            {
-                name: '平均温度',
-                type: 'line',
-                yAxisIndex: 1,
-                data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
             }
         ]
     };
     $.ajax({
-        url: '/venue/profitChange',
+        url: '/venue/profitAverage',
         data: '',
         dataType: 'json',
         success: function (data) {
             if (data.result) {
-                profitChangeOption.xAxis[0].data = Array.from(data.monthList);
-                profitChangeOption.series[0].data = Array.from(data.numberList);
+                profitAverageOption.xAxis[0].data = Array.from(data.activityType);
+                profitAverageOption.series[0].data = Array.from(data.profitAverage);
             }
-            profitChangeChart.setOption(profitChangeOption);
+            profitAverageChart.setOption(profitAverageOption);
+            // profitChangeChart.setOption(profitChangeOption);
         }
     });
 
     var unitPriceChangeChart = echarts.init(document.getElementById("unitPriceChange"));
     var unitPriceChangeOption = {
+        title: {
+            text: '会员订单单价变化'
+        },
         xAxis: {
             type: 'category',
             data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} 元'
+            }
         },
         series: [{
             data: [820, 932, 901, 934, 1290, 1330, 1320],
@@ -228,17 +235,18 @@
         dataType: 'json',
         success: function (data) {
             if (data.result) {
-                unitPriceChangeOption.xAxis[0].data = Array.from(data.monthList);
+                unitPriceChangeOption.xAxis.data = Array.from(data.monthList);
                 unitPriceChangeOption.series[0].data = Array.from(data.unitPrice);
             }
-            console.log(unitPriceChangeOption.xAxis[0].data);
-            console.log(unitPriceChangeOption.series[0].data);
             unitPriceChangeChart.setOption(unitPriceChangeOption);
         }
     });
 
     var profitDistributionChart = echarts.init(document.getElementById("profitDistribution"));
     var profitDistributionOption = {
+        title: {
+            text: '收益分布变化'
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
@@ -297,30 +305,6 @@
                     }
                 },
                 data: [220, 182, 191, 234, 290, 330, 310]
-            },
-            {
-                name: '视频广告',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [150, 212, 201, 154, 190, 330, 410]
-            },
-            {
-                name: '搜索引擎',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [820, 832, 901, 934, 1290, 1330, 1320]
             }
         ]
     };
@@ -331,16 +315,10 @@
         success: function (data) {
             if (data.result) {
                 profitDistributionOption.legend.data = Array.from(data.activityType);
-                profitDistributionOption.xAxis[0].data = Array.from(data.monthList);
-                for (var i = 0; i != 3; i++) {
-                    var object = {
-                        name: activityType[i],
-                        type: 'bar',
-                        stack: '总量',
-                        label: {normal: {show: true, position: 'insideRight'}},
-                        data: Array.from(data.profitPerMonth[i])
-                    };
-                    profitDistributionOption.series.push(object);
+                profitDistributionOption.xAxis.data = Array.from(data.monthList);
+                for (var i = 0; i !== data.activityType.length; i++) {
+                    profitDistributionOption.series[i].name = data.activityType[i];
+                    profitDistributionOption.series[i].data = data.profitPerMonth[i];
                 }
             }
             profitDistributionChart.setOption(profitDistributionOption);
@@ -349,6 +327,9 @@
 
     var activityDistributionChart = echarts.init(document.getElementById("activityDistribution"));
     var activityDistributionOption = {
+        title: {
+            text: '活动分布变化'
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
@@ -369,7 +350,10 @@
             data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} 次'
+            }
         },
         series: [
             {
@@ -407,30 +391,6 @@
                     }
                 },
                 data: [220, 182, 191, 234, 290, 330, 310]
-            },
-            {
-                name: '视频广告',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [150, 212, 201, 154, 190, 330, 410]
-            },
-            {
-                name: '搜索引擎',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [820, 832, 901, 934, 1290, 1330, 1320]
             }
         ]
     };
@@ -441,16 +401,10 @@
         success: function (data) {
             if (data.result) {
                 activityDistributionOption.legend.data = Array.from(data.activityType);
-                activityDistributionOption.xAxis[0].data = Array.from(data.monthList);
-                for (var i = 0; i != 3; i++) {
-                    var object = {
-                        name: activityType[i],
-                        type: 'bar',
-                        stack: '总量',
-                        label: {normal: {show: true, position: 'insideRight'}},
-                        data: Array.from(data.numberPerMonth[i])
-                    };
-                    activityDistributionOption.series.push(object);
+                activityDistributionOption.xAxis.data = Array.from(data.monthList);
+                for (var i = 0; i !== data.activityType.length; i++) {
+                    activityDistributionOption.series[i].name = data.activityType[i];
+                    activityDistributionOption.series[i].data = data.numberPerMonth[i];
                 }
             }
             activityDistributionChart.setOption(activityDistributionOption);

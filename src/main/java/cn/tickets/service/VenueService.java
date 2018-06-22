@@ -2,6 +2,7 @@ package cn.tickets.service;
 
 import cn.tickets.entity.PlanEntity;
 import cn.tickets.entity.VenueEntity;
+import cn.tickets.vo.DetailsVO;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,9 +21,9 @@ public interface VenueService {
     List<String> analysis(Model model,int vid);
 
     Map<String, Object> memberNumber(int vid);
-    Map<String, Object> profitChange(int vid);
+    Map<String, Object> profitAverage(int vid);
     Map<String, Object> unitPriceChange(int vid);
     Map<String, Object> profitDistribution(int vid);
     Map<String, Object> activityDistribution(int vid);
-
+    DetailsVO details(int vid, String type);
 }

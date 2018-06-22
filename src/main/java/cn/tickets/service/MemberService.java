@@ -2,6 +2,7 @@ package cn.tickets.service;
 
 import cn.tickets.entity.ConsumptionEntity;
 import cn.tickets.entity.MemberEntity;
+import cn.tickets.vo.DetailsVO;
 import cn.tickets.vo.MemberAnalysisVO;
 import cn.tickets.vo.MemberInfoVO;
 import org.springframework.ui.Model;
@@ -32,4 +33,5 @@ public interface MemberService {
     Map<String,Object> activityDistribution(int mid);
     Map<String,Object> consumptionDistribution(int mid);
     Map<String,Object> venueDistribution(int mid);
+
 }

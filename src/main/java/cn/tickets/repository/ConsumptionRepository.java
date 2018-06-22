@@ -8,26 +8,37 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, Integer>{
+public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, Integer> {
     List<ConsumptionEntity> findByMid(int mid);
+
     List<ConsumptionEntity> findByMidAndPredefine(int mid, int predefine);
+
     List<ConsumptionEntity> findByVid(int vid);
+
     List<ConsumptionEntity> findByVidAndPredefine(int vid, int predefine);
+
     @Modifying
     @Query(value = "update ConsumptionEntity c set c.predefine = :predefine where c.cid = :cid")
-    void updatePredefine(@Param("predefine")int predefine, @Param("cid")int cid);
+    void updatePredefine(@Param("predefine") int predefine, @Param("cid") int cid);
 
-    List<ConsumptionEntity> findByIsboughtAndPredefine(int isbougnt,int predefine);
+    List<ConsumptionEntity> findByIsboughtAndPredefine(int isbougnt, int predefine);
 
     //过去一个月某会员消费记录
     @Query(nativeQuery = true, value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 1 month) <= date(orderdate)")
-    List<ConsumptionEntity> consumptionsLastMonth(@Param("mid")int mid);
+    List<ConsumptionEntity> consumptionsLastMonth(@Param("mid") int mid);
 
     //过去一年某会员消费记录
-    @Query(nativeQuery = true,value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
-    List<ConsumptionEntity> consumptionsLastYear(@Param("mid")int mid);
+    @Query(nativeQuery = true, value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> consumptionsLastYear(@Param("mid") int mid);
 
     //过去一年某场馆消费记录
-    @Query(nativeQuery = true,value = "select * from consumption where vid=:vid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
-    List<ConsumptionEntity> venueConsumptionLastYear(@Param("vid")int vid);
+    @Query(nativeQuery = true, value = "select * from consumption where vid=:vid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> venueConsumptionLastYear(@Param("vid") int vid);
+
+    //过去某场馆某类型的消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where vid=:vid and type=:type and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> venueTypeConsumptionLastYear(@Param("vid")int vid,@Param("type")String type);
+    //过去某类型消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where type=:type and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> typeConsumptionLastYear(@Param("type")String type);
 }

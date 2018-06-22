@@ -1,9 +1,12 @@
 package cn.tickets.service.impl;
 
 import cn.tickets.entity.ConsumptionEntity;
+import cn.tickets.entity.PlanEntity;
 import cn.tickets.entity.VenueEntity;
 import cn.tickets.repository.ConsumptionRepository;
+import cn.tickets.repository.PlanRepository;
 import cn.tickets.repository.VenueRepository;
+import cn.tickets.service.ConsumptionService;
 import cn.tickets.service.VenueService;
 import cn.tickets.util.Default;
 import cn.tickets.vo.*;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -23,12 +27,14 @@ public class VenueServiceImpl implements VenueService {
 
     private VenueRepository venueRepository;
     private ConsumptionRepository consumptionRepository;
+    private PlanRepository planRepository;
 
 
     @Autowired
-    public VenueServiceImpl(VenueRepository venueRepository, ConsumptionRepository consumptionRepository) {
+    public VenueServiceImpl(VenueRepository venueRepository, ConsumptionRepository consumptionRepository, PlanRepository planRepository) {
         this.venueRepository = venueRepository;
         this.consumptionRepository = consumptionRepository;
+        this.planRepository = planRepository;
     }
 
 
@@ -151,11 +157,11 @@ public class VenueServiceImpl implements VenueService {
                 }
             }
         }
-        for(int i = 0;i<monthList.size();i++){
+        for (int i = 0; i < monthList.size(); i++) {
             HashSet<Integer> midSet = new HashSet<>();
-            for(ConsumptionEntity consumptionEntity:venueConsumptionListLastYear){
+            for (ConsumptionEntity consumptionEntity : venueConsumptionListLastYear) {
                 String orderdate = consumptionEntity.getOrderdate().toString();
-                if(orderdate.compareTo(monthList.get(i))>0&&orderdate.compareTo(monthList2.get(i))<0){
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
                     midSet.add(consumptionEntity.getMid());
                 }
             }
@@ -170,8 +176,32 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public Map<String, Object> profitChange(int vid) {
+    public Map<String, Object> profitAverage(int vid) {
         Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> listLastYear = consumptionRepository.venueConsumptionLastYear(vid);
+        List<String> activityType = new ArrayList<>();
+        for (ConsumptionEntity consumptionEntity : listLastYear) {
+            String activity = consumptionEntity.getType();
+            if (!activityType.contains(activity)) {
+                activityType.add(activity);
+            }
+        }
+        List<Double> profitAverage = new ArrayList<>();
+        for (String activity : activityType) {
+            int sum = 0, iter = 1;
+            for (ConsumptionEntity consumptionEntity : listLastYear) {
+                if (consumptionEntity.getType().equals(activity)) {
+                    sum += consumptionEntity.getAprice();
+                    iter += 1;
+                }
+            }
+            double average = (double) sum / iter;
+            DecimalFormat df = new DecimalFormat("0.0");
+            average = Double.parseDouble(df.format(average));
+            profitAverage.add(average);
+        }
+        result.put("activityType", activityType);
+        result.put("profitAverage", profitAverage);
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -219,7 +249,7 @@ public class VenueServiceImpl implements VenueService {
             double unitPrice;
             if (seatSumArray[i] != 0) {
                 unitPrice = priceSumArray[i] / seatSumArray[i];
-            }else{
+            } else {
                 unitPrice = 0.0;
             }
 
@@ -294,6 +324,8 @@ public class VenueServiceImpl implements VenueService {
         result.put("activityType", activityName);
         result.put("monthList", monthList);
         result.put("profitPerMonth", profitPerMonth);
+        System.err.println(profitPerMonth.size());
+        System.err.println(profitPerMonth.toString());
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
@@ -359,7 +391,69 @@ public class VenueServiceImpl implements VenueService {
         result.put("activityType", activityName);
         result.put("monthList", monthList);
         result.put("numberPerMonth", numberPerMonth);
+        System.err.println(numberPerMonth.size());
+        System.err.println(numberPerMonth.toString());
         result.put(Default.HTTP_RESULT, true);
         return result;
+    }
+
+    @Override
+    public DetailsVO details(int vid, String type) {
+        List<ConsumptionEntity> typeConsumptionSum = consumptionRepository.typeConsumptionLastYear(type);
+        List<ConsumptionEntity> venueTypeConsumptionSum = consumptionRepository.venueTypeConsumptionLastYear(vid, type);
+        System.err.println(typeConsumptionSum.toString());
+        System.err.println(venueTypeConsumptionSum.toString());
+        double averagePrice = 0, venueAveragePrice = 0;
+        for (ConsumptionEntity consumptionEntity : typeConsumptionSum) {
+            averagePrice += consumptionEntity.getFprice() + consumptionEntity.getBprice();
+        }
+        averagePrice /= typeConsumptionSum.size();
+        for (ConsumptionEntity consumptionEntity : venueTypeConsumptionSum) {
+            venueAveragePrice += consumptionEntity.getFprice() + consumptionEntity.getBprice();
+        }
+        venueAveragePrice /= venueTypeConsumptionSum.size();
+        DecimalFormat df = new DecimalFormat("0.0");
+        DetailsVO detailsVO = new DetailsVO();
+        String price = df.format(venueAveragePrice / averagePrice * 100) + "%";
+        //给票价指数赋值
+        detailsVO.setPrice(price);
+
+        DateFormat df2 = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+        List<String> dateList = new ArrayList<>();
+        int seatingNumber = 0;
+        for (ConsumptionEntity consumptionEntity : venueTypeConsumptionSum) {
+            String date = df2.format(consumptionEntity.getDate());
+            System.err.println(date);
+            if (!dateList.contains(date)) {
+                dateList.add(date);
+            }
+            seatingNumber += consumptionEntity.getFsnumber() + consumptionEntity.getBsnumber();
+        }
+        int allSeatNumber = venueRepository.findById(vid).getFsnumber() + venueRepository.findById(vid).getBsnumber();
+        System.err.println(dateList);
+        double seatingRatio = seatingNumber / (dateList.size()* allSeatNumber);
+        String seat = df.format(seatingRatio*100)+"%";
+        //给入座率赋值
+        detailsVO.setSeat(seat);
+
+        double venueProfit=0.0,allProfit=0.0;
+        List<String> allDatelist = new ArrayList<>();
+        for(ConsumptionEntity consumptionEntity:typeConsumptionSum){
+            allProfit += consumptionEntity.getAprice();
+            String date = df2.format(consumptionEntity.getDate());
+            if(!dateList.contains(date)){
+                dateList.add(date);
+            }
+        }
+        allProfit /= allDatelist.size();
+        for(ConsumptionEntity consumptionEntity:venueTypeConsumptionSum){
+            venueProfit += consumptionEntity.getAprice();
+        }
+        venueProfit /= dateList.size();
+        String profit = df.format(venueProfit / allProfit * 100)+"%";
+        //给收益率赋值
+        detailsVO.setProfit(profit);
+
+        return detailsVO;
     }
 }

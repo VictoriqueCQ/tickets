@@ -29,6 +29,7 @@ public class VenueController {
     private VenueRepository venueRepository;
     private ManagerService managerService;
     private static Locale locale = new Locale("zh");
+    private static String type;
 
     @Autowired
     public VenueController(VenueService venueService, PlanService planService, ConsumptionService consumptionService, VenueRepository venueRepository, ManagerService managerService) {
@@ -53,7 +54,6 @@ public class VenueController {
         model.addAttribute("locale", locale);
         return venueService.statistics(model, vid);
     }
-
 
 
     @RequestMapping({"/", "/index"})
@@ -92,16 +92,16 @@ public class VenueController {
     @RequestMapping("/scene")
     public String scene(@SessionAttribute(Default.USER_ID) int id, Model model) {
         model.addAttribute("locale", locale);
-        return planService.scenePlan(model,id);
+        return planService.scenePlan(model, id);
     }
 
     @RequestMapping("/buy")
     @ResponseBody
     public Map<String, Object> buy(@SessionAttribute(Default.USER_ID) int id, int mid, int pid, int fsnumber, int bsnumber) {
         Map<String, Object> result = new TreeMap<>();
-        int aprice = consumptionService.sceneBuy(id,mid,pid,fsnumber,bsnumber);
-        result.put("aprice",aprice);
-        result.put(Default.HTTP_RESULT,true);
+        int aprice = consumptionService.sceneBuy(id, mid, pid, fsnumber, bsnumber);
+        result.put("aprice", aprice);
+        result.put(Default.HTTP_RESULT, true);
 
         return result;
     }
@@ -111,7 +111,7 @@ public class VenueController {
     public Map<String, Object> check(int cid) {
         Map<String, Object> result = new TreeMap<>();
         boolean flag = consumptionService.check(cid);
-        result.put(Default.HTTP_RESULT,flag);
+        result.put(Default.HTTP_RESULT, flag);
         return result;
     }
 
@@ -120,7 +120,7 @@ public class VenueController {
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int vid) {
 //        return venueService.analysis(model,vid);
-        model.addAttribute("venueAnalysis",venueService.analysis(model,vid));
+        model.addAttribute("venueAnalysis", venueService.analysis(model, vid));
         return "venue/analysis";
     }
 
@@ -130,10 +130,10 @@ public class VenueController {
         return venueService.memberNumber(vid);
     }
 
-    @RequestMapping("/profitChange")
+    @RequestMapping("/profitAverage")
     @ResponseBody
-    public Map<String, Object> profitChange(@SessionAttribute("userID") int vid) {
-        return venueService.profitChange(vid);
+    public Map<String, Object> profitAverage(@SessionAttribute("userID") int vid) {
+        return venueService.profitAverage(vid);
     }
 
     @RequestMapping("/unitPriceChange")
@@ -152,6 +152,22 @@ public class VenueController {
     @ResponseBody
     public Map<String, Object> activityDistribution(@SessionAttribute("userID") int vid) {
         return venueService.activityDistribution(vid);
+    }
+
+    @RequestMapping("/details")
+    public String details(Model model, @SessionAttribute("userID") int vid) {
+        String type = this.type;
+        model.addAttribute("details", venueService.details(vid,type));
+        return "venue/details";
+    }
+
+    @RequestMapping("/getActivityType")
+    @ResponseBody
+    public Map<String,Object> getActivityType(String type){
+        Map<String, Object> result = new TreeMap<>();
+        this.type = type;
+        result.put(Default.HTTP_RESULT, true);
+        return result;
     }
 
 }
