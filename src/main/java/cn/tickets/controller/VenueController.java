@@ -157,17 +157,28 @@ public class VenueController {
     @RequestMapping("/details")
     public String details(Model model, @SessionAttribute("userID") int vid) {
         String type = this.type;
-        model.addAttribute("details", venueService.details(vid,type));
+        model.addAttribute("details", venueService.details(vid, type));
         return "venue/details";
     }
 
     @RequestMapping("/getActivityType")
     @ResponseBody
-    public Map<String,Object> getActivityType(String type){
+    public Map<String, Object> getActivityType(String type) {
         Map<String, Object> result = new TreeMap<>();
         this.type = type;
         result.put(Default.HTTP_RESULT, true);
         return result;
     }
 
+    @RequestMapping("/priceSeatingFunction")
+    @ResponseBody
+    public Map<String, Object> priceSeatingFunction(@SessionAttribute("userID") int vid) {
+        return venueService.priceSeatingFunction(vid, type);
+    }
+
+    @RequestMapping("/profitPriceFunction")
+    @ResponseBody
+    public Map<String, Object> profitPriceFunction(@SessionAttribute("userID") int vid) {
+        return venueService.profitPriceFunction(vid, type);
+    }
 }

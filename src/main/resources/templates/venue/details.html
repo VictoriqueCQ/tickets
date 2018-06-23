@@ -41,8 +41,8 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div id="price-seatingRatio" class="col-md-6">票价与入座率关系图</div>
-            <div id="profit-price" class="col-md-6">总收益与票价关系图</div>
+            <div id="price-seatingRatio" class="col-md-6" style="width: 600px;height: 300px;">票价与入座率关系图</div>
+            <div id="profit-price" class="col-md-6" style="width: 600px;height: 300px;">总收益与票价关系图</div>
         </div>
     </div>
 </div>
@@ -50,7 +50,75 @@
 <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
+    var priceSeatingChart = echarts.init(document.getElementById('price-seatingRatio'));
+    var priceSeatingOption = {
+        title: {
+            text: '场馆活跃会员数量变化'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 人次'
+            }
+        },
+        series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            smooth: true
+        }]
+    };
+    $.ajax({
+        url: '/venue/priceSeatingFunction',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                priceSeatingOption.xAxis.data = Array.from(data.monthList);
+                priceSeatingOption.series[0].data = Array.from(data.memberNumberList);
+            }
+            priceSeatingChart.setOption(priceSeatingOption);
+        }
+    });
 
+    var profitPriceChart = echarts.init(document.getElementById('profit-price'));
+    var profitPriceOption = {
+        title: {
+            text: '场馆活跃会员数量变化'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 人次'
+            }
+        },
+        series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            smooth: true
+        }]
+    };
+    $.ajax({
+        url: '/venue/profitPriceFunction',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                profitPriceOption.xAxis.data = Array.from(data.monthList);
+                profitPriceOption.series[0].data = Array.from(data.memberNumberList);
+            }
+            profitPriceChart.setOption(profitPriceOption);
+        }
+    });
 </script>
 </body>
 </html>x

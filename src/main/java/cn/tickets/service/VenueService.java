@@ -26,4 +26,6 @@ public interface VenueService {
     Map<String, Object> profitDistribution(int vid);
     Map<String, Object> activityDistribution(int vid);
     DetailsVO details(int vid, String type);
+    Map<String, Object> priceSeatingFunction(int vid, String type);
+    Map<String, Object> profitPriceFunction(int vid, String type);
 }
