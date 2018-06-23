@@ -37,8 +37,22 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
 
     //过去某场馆某类型的消费记录
     @Query(nativeQuery = true, value = "select * from consumption where vid=:vid and type=:type and date_sub(curdate(), interval 12 month) <= date(orderdate)")
-    List<ConsumptionEntity> venueTypeConsumptionLastYear(@Param("vid")int vid,@Param("type")String type);
+    List<ConsumptionEntity> venueTypeConsumptionLastYear(@Param("vid") int vid, @Param("type") String type);
+
     //过去某类型消费记录
     @Query(nativeQuery = true, value = "select * from consumption where type=:type and date_sub(curdate(), interval 12 month) <= date(orderdate)")
-    List<ConsumptionEntity> typeConsumptionLastYear(@Param("type")String type);
+    List<ConsumptionEntity> typeConsumptionLastYear(@Param("type") String type);
+
+    //过去3个月所有消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where date(orderdate)>=date_sub(curdate(), interval 3 month)")
+    List<ConsumptionEntity> allConsumptionLastQuarter();
+    //过去3-6个月所有消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where date(orderdate)>=date_sub(curdate(), interval 6 month) and date(orderdate)<=date_sub(curdate(), interval 3 month)")
+    List<ConsumptionEntity> allConsumptionLastSecondQuarter();
+    //过去6-9个月所有消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where date(orderdate)>=date_sub(curdate(), interval 9 month) and date(orderdate)<=date_sub(curdate(), interval 6 month)")
+    List<ConsumptionEntity> allConsumptionLastThirdQuarter();
+    //过去9-12个月所有消费记录
+    @Query(nativeQuery = true, value = "select * from consumption where date(orderdate)>=date_sub(curdate(), interval 12 month) and date(orderdate)<=date_sub(curdate(), interval 9 month)")
+    List<ConsumptionEntity> allConsumptionLastFourthQuarter();
 }

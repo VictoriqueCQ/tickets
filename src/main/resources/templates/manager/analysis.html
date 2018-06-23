@@ -32,7 +32,7 @@
                         class="sr-only">(current)</span></a></li>
                 <li><a href="statistics.html" th:href="@{statistics}">Statistics</a></li>
                 <li><a href="settlement.html" th:href="@{settlement}">Venue Settlement</a></li>
-                <li class="active"><a href="analysis.html" th:href="@{analysis}">Analysis</a> </li>
+                <li class="active"><a href="analysis.html" th:href="@{analysis}">Analysis</a></li>
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -49,5 +49,99 @@
     </div><!-- /.container-fluid -->
 </nav>
 
+<div class="mainpage">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <h1>经营情况分析</h1>
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <h5>过去3个月入座率</h5>
+                <p th:text="${}">90%</p>
+                <h5>过去3-6个月入座率</h5>
+                <p th:text="${}">85%</p>
+                <h5>过去6-9个月入座率</h5>
+                <p th:text="${}">80%</p>
+                <h5>过去9-12个月入座率</h5>
+                <p th:text="${}">70%</p>
+            </div>
+            <div class="col-md-6">
+                <h3>过去一年</h3>
+                <h3>Tickets平台总收益</h3>
+                <h2 th:text="${}">1000000元</h2>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="col-md-6" style="height: 300px;width: 600px;">不同场馆收益占Tickets平台总收益的比例</div>
+            <div class="col-md-6" style="height: 300px;width: 600px;">不同活动收益占Tickets平台总收益的比例</div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="col-md-8" style="height: 450px;width: 750px;">过去一年Tickets平台收益增长率</div>
+            <div class="col-md-4" style="height:450px;width: 450px;">
+                <div class="panel panel-info">
+                    <div class="panel-heading">具体活动</div>
+                    <table class="table table-hover" id="VenueTable">
+                        <tr th:each="venue:${managerAnalysis}">
+                            <td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>
+                            <td style="width: 50%">
+                                <button class="details">查看详情</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="col-md-6" style="height: 300px;width: 600px;">活跃会员变化趋势每月</div>
+            <div class="col-md-6" style="height: 300px;width: 600px;">场馆数量变化趋势每月</div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="col-md-6" style="height: 300px;width: 600px;">订单数量变化趋势——折线图每月</div>
+            <div class="col-md-6" style="height: 300px;width: 600px;">不同类型活动变化趋势——柱状图每月</div>
+        </div>
+
+
+        <h1>会员情况分析</h1>
+        <div class="col-md-12">
+            <div class="col-md-6" style="height:300px;width: 600px;">
+                <h5>过去一年</h5>
+                <h5>所有会员退款率</h5>
+                <div></div>
+            </div>
+            <div class="col-md-6" style="height:300px;width: 600px;">
+                <h5>过去一年</h5>
+                <h5>活跃会员比例</h5>
+                <div></div>
+            </div>
+        </div>
+        <div class="col-md-12">
+
+            <div class="col-md-6" style="height:450px;width: 750px;">
+                <h5>过去一年</h5>
+                <h5>所有会员订单平均单价</h5>
+            </div>
+            <div class="col-md-4" style="height:450px;width: 450px;">
+                <br>
+                <br>
+                <div class="panel panel-info">
+                    <div class="panel-heading">具体活动</div>
+                    <table class="table table-hover" id="MemberTable">
+                        <tr th:each="member:${managerAnalysis}">
+                            <td class="venueName" th:text="${member}" style="width: 50%;">场馆a</td>
+                            <td style="width: 50%">
+                                <button class="details">查看详情</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
