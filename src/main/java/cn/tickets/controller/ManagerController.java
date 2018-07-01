@@ -74,7 +74,6 @@ public class ManagerController {
     //以下是管理信息系统作业新增代码
     @RequestMapping("/analysis")
     public String analysis(Model model, @SessionAttribute("userID") int mid) {
-//        return managerService.analysis(model);
         model.addAttribute("managerAnalysis",managerService.analysis(model));
         return "manager/analysis";
     }
