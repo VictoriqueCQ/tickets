@@ -10,6 +10,7 @@ import cn.tickets.repository.PlanRepository;
 import cn.tickets.repository.VenueRepository;
 import cn.tickets.service.ManagerService;
 import cn.tickets.util.Default;
+import cn.tickets.vo.ManagementAnalysisVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -30,7 +33,7 @@ public class ManagerServiceImpl implements ManagerService {
     private PlanRepository planRepository;
 
     @Autowired
-    public ManagerServiceImpl(ConsumptionRepository consumptionRepository, VenueRepository venueRepository, MemberRepository memberRepository,PlanRepository planRepository) {
+    public ManagerServiceImpl(ConsumptionRepository consumptionRepository, VenueRepository venueRepository, MemberRepository memberRepository, PlanRepository planRepository) {
         this.consumptionRepository = consumptionRepository;
         this.venueRepository = venueRepository;
         this.memberRepository = memberRepository;
@@ -143,8 +146,6 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
 
-
-
     @Override
     public List<VenueEntity> getAllOpenApplication() {
         List<VenueEntity> result = new ArrayList<>(Default.LIST_DEFAULT_SIZE);
@@ -175,25 +176,25 @@ public class ManagerServiceImpl implements ManagerService {
         List<Integer> realConsumption = new ArrayList<>(venueEntities.size());
         List<Integer> memberDiscount = new ArrayList<>(venueEntities.size());
 
-        for(VenueEntity venueEntity : venueEntities){
+        for (VenueEntity venueEntity : venueEntities) {
             int consumptionSum = 0;
             int discountSum = 0;
             int vid = venueEntity.getId();
             List<ConsumptionEntity> consumptionEntities = consumptionRepository.findByVid(vid);
-            for(ConsumptionEntity consumptionEntity : consumptionEntities){
+            for (ConsumptionEntity consumptionEntity : consumptionEntities) {
                 Timestamp date = consumptionEntity.getDate();
-                PlanEntity planEntity = planRepository.findByDateAndVid(date,vid);
+                PlanEntity planEntity = planRepository.findByDateAndVid(date, vid);
                 consumptionSum += consumptionEntity.getAprice();
-                discountSum += planEntity.getFprice()*consumptionEntity.getFsnumber()+planEntity.getBprice()*consumptionEntity.getBsnumber()-consumptionEntity.getAprice();
+                discountSum += planEntity.getFprice() * consumptionEntity.getFsnumber() + planEntity.getBprice() * consumptionEntity.getBsnumber() - consumptionEntity.getAprice();
             }
             venueNameList.add(venueEntity.getName());
             realConsumption.add(consumptionSum);
             memberDiscount.add(discountSum);
         }
-        result.put("venueNameList",venueNameList);
-        result.put("realConsumption",realConsumption);
-        result.put("memberDiscount",memberDiscount);
-        result.put(Default.HTTP_RESULT,true);
+        result.put("venueNameList", venueNameList);
+        result.put("realConsumption", realConsumption);
+        result.put("memberDiscount", memberDiscount);
+        result.put(Default.HTTP_RESULT, true);
         return result;
 
     }
@@ -201,8 +202,91 @@ public class ManagerServiceImpl implements ManagerService {
 
     //以下是管理信息系统作业新增代码
     @Override
-    public String analysis(Model model) {
-        return null;
+    public ManagementAnalysisVO analysis(Model model) {
+        Map<String, Object> result = new TreeMap<>();
+        //过去3个月入座率
+        String firstSeatingRatio = getSeatingRatio(1);
+        //过去3-6个月入座率
+        String secondSeatingRatio = getSeatingRatio(2);
+        //过去6-9个月入座率
+        String thirdSeatingRatio = getSeatingRatio(3);
+        //过去9-12个月入座率
+        String fourthSeatingRatio = getSeatingRatio(4);
+//        result.put("firstSR",firstSeatingRatio);
+//        result.put("secondSR",secondSeatingRatio);
+//        result.put("thirdSR",thirdSeatingRatio);
+//        result.put("fourthSR",fourthSeatingRatio);
+        List<ConsumptionEntity> allConsumLastYear = consumptionRepository.allConsumptionLastYear();
+        int allProfitLastYear = 0;
+        for(ConsumptionEntity consumptionEntity:allConsumLastYear){
+            allProfitLastYear += consumptionEntity.getAprice();
+        }
+//        result.put("allProfitLastYear",allProfitLastYear);
+//        result.put(Default.HTTP_RESULT, true);
+        ManagementAnalysisVO managementAnalysisVO = new ManagementAnalysisVO();
+        managementAnalysisVO.setFirstSR(firstSeatingRatio);
+        managementAnalysisVO.setSecondSR(secondSeatingRatio);
+        managementAnalysisVO.setThirdSR(thirdSeatingRatio);
+        managementAnalysisVO.setFourthSR(fourthSeatingRatio);
+        String aplyStr = allProfitLastYear+"元";
+        managementAnalysisVO.setAllProfitLastYear(aplyStr);
+        System.err.println(managementAnalysisVO.toString());
+        return managementAnalysisVO;
+    }
+
+    String getSeatingRatio(int num) {
+        DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<ConsumptionEntity> consumLastQuarter = null;
+        String srStr;
+        if (num == 1) {
+            consumLastQuarter = consumptionRepository.allConsumptionLastQuarter();
+        } else if (num == 2) {
+            consumLastQuarter = consumptionRepository.allConsumptionLastSecondQuarter();
+        } else if (num == 3) {
+            consumLastQuarter = consumptionRepository.allConsumptionLastThirdQuarter();
+        } else if (num == 4) {
+            consumLastQuarter = consumptionRepository.allConsumptionLastFourthQuarter();
+        }
+
+        if(consumLastQuarter.size()!=0){
+            Map<Integer, List<String>> activityLastQuarter = new HashMap<>();
+            //按场馆获得所有活动日期
+            for (ConsumptionEntity consumptionEntity : consumLastQuarter) {
+                int vid = consumptionEntity.getVid();
+                String consumDate = df1.format(consumptionEntity.getDate());
+                if (!activityLastQuarter.containsKey(vid)) {
+                    List<String> dateList = new ArrayList<>();
+                    dateList.add(consumDate);
+                    activityLastQuarter.put(vid, dateList);
+                } else {
+                    if (!activityLastQuarter.get(vid).contains(consumDate)) {
+                        activityLastQuarter.get(vid).add(consumDate);
+                    }
+                }
+            }
+            //获得总座位数
+            Set<Integer> vidKeys = activityLastQuarter.keySet();
+            int allSeatNumber = 0;
+            for (int vid : vidKeys) {
+                int activityTime = activityLastQuarter.get(vid).size();
+                VenueEntity venueEntity = venueRepository.findById(vid);
+                int seatNumber = venueEntity.getBsnumber() + venueEntity.getFsnumber();
+                allSeatNumber += seatNumber * activityTime;
+            }
+            //获得入座数
+            int hasSeatedNumber = 0;
+            for (ConsumptionEntity consumptionEntity : consumLastQuarter) {
+                hasSeatedNumber += consumptionEntity.getFsnumber() + consumptionEntity.getBsnumber();
+            }
+            DecimalFormat df2 = new DecimalFormat("0.0");
+            String seatingRatio = df2.format((double) hasSeatedNumber / allSeatNumber * 100) + "%";
+            srStr = seatingRatio;
+        }else{
+            srStr = "0.0%";
+        }
+
+
+        return srStr;
     }
 
 

@@ -470,7 +470,7 @@ public class VenueServiceImpl implements VenueService {
             }
         }
 
-        //计算入座率
+        //计算票价
         List<Integer> seatRatioList = new ArrayList<>();
         VenueEntity venueEntity = venueRepository.findById(vid);
         List<Integer> seatPriceList = new ArrayList<>();
