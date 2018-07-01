@@ -212,17 +212,11 @@ public class ManagerServiceImpl implements ManagerService {
         String thirdSeatingRatio = getSeatingRatio(3);
         //过去9-12个月入座率
         String fourthSeatingRatio = getSeatingRatio(4);
-//        result.put("firstSR",firstSeatingRatio);
-//        result.put("secondSR",secondSeatingRatio);
-//        result.put("thirdSR",thirdSeatingRatio);
-//        result.put("fourthSR",fourthSeatingRatio);
         List<ConsumptionEntity> allConsumLastYear = consumptionRepository.allConsumptionLastYear();
         int allProfitLastYear = 0;
         for(ConsumptionEntity consumptionEntity:allConsumLastYear){
             allProfitLastYear += consumptionEntity.getAprice();
         }
-//        result.put("allProfitLastYear",allProfitLastYear);
-//        result.put(Default.HTTP_RESULT, true);
         ManagementAnalysisVO managementAnalysisVO = new ManagementAnalysisVO();
         managementAnalysisVO.setFirstSR(firstSeatingRatio);
         managementAnalysisVO.setSecondSR(secondSeatingRatio);
@@ -284,8 +278,6 @@ public class ManagerServiceImpl implements ManagerService {
         }else{
             srStr = "0.0%";
         }
-
-
         return srStr;
     }
 

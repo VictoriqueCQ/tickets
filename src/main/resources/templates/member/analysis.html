@@ -118,13 +118,13 @@
             <h2 th:text="${memberAnalysis.orderRatio}">100</h2>
         </div>
     </div>
-    echarts.init(document.getElementById("activity"));
+
 </div>
 
 <script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
-    var activityChart = echarts.init(document.getElementById('activity'));
+    var activityChart = echarts.init(document.getElementById("activity"));
     var activityOption = {
         tooltip: {
             trigger: 'item',
