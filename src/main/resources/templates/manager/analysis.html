@@ -393,12 +393,10 @@
         data: '',
         dataType: 'json',
         success: function (data) {
-            // alert(JSON.stringify(data));
             if (data.result) {
                 activeVenueNumberOption.xAxis.data = Array.from(data.quarterList);
                 activeVenueNumberOption.series[0].data = Array.from(data.activeVenueNumberList);
             }
-            // alert(activeVenueNumberOption.xAxis.data);
             activeVenueNumberChart.setOption(activeVenueNumberOption);
         }
     });
