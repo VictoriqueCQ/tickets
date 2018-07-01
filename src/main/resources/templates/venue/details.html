@@ -47,29 +47,44 @@
     </div>
 </div>
 
-<script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
     var priceSeatingChart = echarts.init(document.getElementById('price-seatingRatio'));
     var priceSeatingOption = {
         title: {
-            text: '场馆活跃会员数量变化'
+            text: '票价与入座率的关系'
         },
         xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            type: 'value',
+            scale: true,
+            axisLabel: {
+                formatter: '{value}元'
+            }
         },
         yAxis: {
             type: 'value',
-            interval: 1,
+            scale: true,
             axisLabel: {
-                formatter: '{value} 人次'
+                formatter: '{value}%'
             }
         },
         series: [{
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true
+            symbolSize: 20,
+            data: [
+                [10.0, 8.04],
+                [8.0, 6.95],
+                [13.0, 7.58],
+                [9.0, 8.81],
+                [11.0, 8.33],
+                [14.0, 9.96],
+                [6.0, 7.24],
+                [4.0, 4.26],
+                [12.0, 10.84],
+                [7.0, 4.82],
+                [5.0, 5.68]
+            ],
+            type: 'scatter'
         }]
     };
     $.ajax({
@@ -78,33 +93,52 @@
         dataType: 'json',
         success: function (data) {
             if (data.result) {
-                priceSeatingOption.xAxis.data = Array.from(data.monthList);
-                priceSeatingOption.series[0].data = Array.from(data.memberNumberList);
+                // alert(data);
+                priceSeatingOption.series[0].data = Array.from(data.priceSeating);
+
             }
+            // alert(priceSeatingOption.series[0].data);
             priceSeatingChart.setOption(priceSeatingOption);
         }
     });
 
+
     var profitPriceChart = echarts.init(document.getElementById('profit-price'));
-    var profitPriceOption = {
+
+    profitPriceOption = {
         title: {
-            text: '场馆活跃会员数量变化'
+            text: '收益与票价的关系'
         },
         xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            type: 'value',
+            scale: true,
+            axisLabel: {
+                formatter: '{value}元'
+            }
         },
         yAxis: {
             type: 'value',
-            interval: 1,
+            scale: true,
             axisLabel: {
-                formatter: '{value} 人次'
+                formatter: '{value}元'
             }
         },
         series: [{
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true
+            symbolSize: 20,
+            data: [
+                [10.0, 8.04],
+                [8.0, 6.95],
+                [13.0, 7.58],
+                [9.0, 8.81],
+                [11.0, 8.33],
+                [14.0, 9.96],
+                [6.0, 7.24],
+                [4.0, 4.26],
+                [12.0, 10.84],
+                [7.0, 4.82],
+                [5.0, 5.68]
+            ],
+            type: 'scatter'
         }]
     };
     $.ajax({
@@ -113,12 +147,15 @@
         dataType: 'json',
         success: function (data) {
             if (data.result) {
-                profitPriceOption.xAxis.data = Array.from(data.monthList);
-                profitPriceOption.series[0].data = Array.from(data.memberNumberList);
+                // alert(data);
+                profitPriceOption.series[0].data = Array.from(data.profitPrice);
             }
+            // alert(profitPriceOption.series[0].data);
             profitPriceChart.setOption(profitPriceOption);
         }
     });
+
+
 </script>
 </body>
 </html>x
