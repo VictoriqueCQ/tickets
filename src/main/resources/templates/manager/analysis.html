@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css"
           th:href="@{../../static/css/bootstrap-theme.min.css}"/>
     <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <script src="../../static/js/echarts.min.js" th:src="@{../../static/js/echarts.min.js}"></script>
     <title>Manager Analysis</title>
 </head>
 <body>
@@ -73,21 +74,22 @@
         </div>
 
         <div class="col-md-12">
-            <div class="col-md-6" style="height: 300px;width: 600px;">不同场馆收益占Tickets平台总收益的比例</div>
-            <div class="col-md-6" style="height: 300px;width: 600px;">不同活动收益占Tickets平台总收益的比例</div>
+            <div id="venueProfitRatio" class="col-md-6" style="height: 300px;width: 600px;">不同场馆收益占Tickets平台总收益的比例</div>
+            <div id="activityProfitRatio" class="col-md-6" style="height: 300px;width: 600px;">不同活动收益占Tickets平台总收益的比例
+            </div>
         </div>
 
         <div class="col-md-12">
-            <div class="col-md-8" style="height: 450px;width: 750px;">过去一年Tickets平台收益增长率</div>
+            <div id="profitChange" class="col-md-8" style="height: 450px;width: 750px;">过去一年Tickets平台收益变化</div>
             <div class="col-md-4" style="height:450px;width: 450px;">
                 <div class="panel panel-info">
                     <div class="panel-heading">具体活动</div>
                     <table class="table table-hover" id="VenueTable">
                         <!--<tr th:each="venue:${managerAnalysis}">-->
-                            <!--<td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>-->
-                            <!--<td style="width: 50%">-->
-                                <!--<button class="details">查看详情</button>-->
-                            <!--</td>-->
+                        <!--<td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>-->
+                        <!--<td style="width: 50%">-->
+                        <!--<button class="details">查看详情</button>-->
+                        <!--</td>-->
                         <!--</tr>-->
                     </table>
                 </div>
@@ -95,34 +97,35 @@
         </div>
 
         <div class="col-md-12">
-            <div class="col-md-6" style="height: 300px;width: 600px;">活跃会员变化趋势每月</div>
-            <div class="col-md-6" style="height: 300px;width: 600px;">场馆数量变化趋势每月</div>
+            <div id="activeMemberNumber" class="col-md-6" style="height: 300px;width: 600px;">活跃会员变化趋势每季度</div>
+            <div id="activeVenueNumber" class="col-md-6" style="height: 300px;width: 600px;">活跃场馆数量变化趋势每季度</div>
         </div>
 
         <div class="col-md-12">
-            <div class="col-md-6" style="height: 300px;width: 600px;">订单数量变化趋势——折线图每月</div>
-            <div class="col-md-6" style="height: 300px;width: 600px;">不同类型活动变化趋势——柱状图每月</div>
+            <div id="order-month" class="col-md-6" style="height: 300px;width: 600px;">订单数量变化趋势——折线图每季度</div>
+            <div id="activityType-month" class="col-md-6" style="height: 300px;width: 600px;">不同类型活动数量变化趋势——柱状图每季度</div>
         </div>
 
 
         <h1>会员情况分析</h1>
         <div class="col-md-12">
-            <div class="col-md-6" style="height:300px;width: 600px;">
+            <div class="col-md-6">
                 <h5>过去一年</h5>
                 <h5>所有会员退款率</h5>
-                <div></div>
+                <div id="refundRatio" style="height:300px;width: 600px;"></div>
             </div>
-            <div class="col-md-6" style="height:300px;width: 600px;">
+            <div>
                 <h5>过去一年</h5>
                 <h5>活跃会员比例</h5>
-                <div></div>
+                <div id="activityMemberRatio" class="col-md-6" style="height:300px;width: 600px;"></div>
             </div>
         </div>
         <div class="col-md-12">
 
-            <div class="col-md-6" style="height:450px;width: 750px;">
+            <div class="col-md-6">
                 <h5>过去一年</h5>
                 <h5>所有会员订单平均单价</h5>
+                <div id="averagePrice" style="height:450px;width: 750px;"></div>
             </div>
             <div class="col-md-4" style="height:450px;width: 450px;">
                 <br/>
@@ -131,10 +134,10 @@
                     <div class="panel-heading">具体活动</div>
                     <table class="table table-hover" id="MemberTable">
                         <!--<tr th:each="member:${managerAnalysis}">-->
-                            <!--<td class="venueName" th:text="${member}" style="width: 50%;">场馆a</td>-->
-                            <!--<td style="width: 50%">-->
-                                <!--<button class="details">查看详情</button>-->
-                            <!--</td>-->
+                        <!--<td class="venueName" th:text="${member}" style="width: 50%;">场馆a</td>-->
+                        <!--<td style="width: 50%">-->
+                        <!--<button class="details">查看详情</button>-->
+                        <!--</td>-->
                         <!--</tr>-->
                     </table>
                 </div>
@@ -143,5 +146,263 @@
 
     </div>
 </div>
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+
+    var venueProfitRatioChart = echarts.init(document.getElementById("venueProfitRatio"));
+    var venueProfitRatioOption = {
+        title: {
+            text: '不同场馆收益占Tickets平台总收益的比例'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            x: 'left',
+            data: []
+        },
+        series: [
+            {
+                name: 'Num of type',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        show: true,
+                        textStyle: {
+                            fontSize: '30',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data: [
+                    {value: 335, name: 'Member Card'},
+                    {value: 310, name: 'Cash'},
+                    {value: 234, name: 'Credit Card'}
+                ]
+            }
+        ]
+    };
+
+    $.ajax({
+        url: '/manager/venueProfitRatio',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                venueProfitRatioOption.series[0].data = [];
+                for (var i = 0; i != data.venueNameList.length; i++) {
+                    var object = {value: data.profitList[i], name: data.venueNameList[i]};
+                    venueProfitRatioOption.series[0].data.push(object);
+                }
+            }
+            venueProfitRatioChart.setOption(venueProfitRatioOption);
+        }
+    });
+
+
+    var activityProfitRatioChart = echarts.init(document.getElementById("activityProfitRatio"));
+    var activityProfitRatioOption = {
+        title: {
+            text: '不同活动收益占Tickets平台总收益的比例'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+            orient: 'vertical',
+            x: 'left',
+            data: []
+        },
+        series: [
+            {
+                name: 'Num of type',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    normal: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        show: true,
+                        textStyle: {
+                            fontSize: '30',
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data: [
+                    {value: 335, name: 'Member Card'},
+                    {value: 310, name: 'Cash'},
+                    {value: 234, name: 'Credit Card'}
+                ]
+            }
+        ]
+    };
+
+    $.ajax({
+        url: '/manager/activityProfitRatio',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                activityProfitRatioOption.series[0].data = [];
+                for (var i = 0; i != data.typeList.length; i++) {
+                    var object = {value: data.profitList[i], name: data.typeList[i]};
+                    activityProfitRatioOption.series[0].data.push(object);
+                }
+            }
+            activityProfitRatioChart.setOption(activityProfitRatioOption);
+        }
+    });
+
+    var profitChangeChart = echarts.init(document.getElementById('profitChange'));
+    var profitChangeOption = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: ['消费金额']
+        },
+        grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '10%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                name: 'Time',
+                type: 'category',
+                data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",]
+            }
+        ],
+        yAxis: [
+            {
+                name: 'Consumption',
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '消费金额',
+                type: 'bar',
+                stack: 'Day Income',
+                data: [620, 732, 701, 734, 1090, 1130, 1120, 732, 701, 734, 1090, 1130]
+            }
+        ]
+    };
+
+    $.ajax({
+        url: '/manager/profitChange',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                profitChangeOption.xAxis[0].data = Object.keys(data.quarterList).map(function (k) {
+                    return data.quarterList[k]
+                });
+                profitChangeOption.series[0].data = Array.from(data.profitList);
+                profitChangeChart.setOption(profitChangeOption);
+            }
+        }
+    });
+
+
+    var activeMemberNumberChart = echarts.init(document.getElementById('activeMemberNumber'));
+    var activeMemberNumberOption = {
+        title: {
+            text: '活跃会员数量变化'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 人'
+            }
+        },
+        series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line'
+        }]
+    };
+    $.ajax({
+        url: '/manager/activeMemberNumber',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                activeMemberNumberOption.xAxis.data = Array.from(data.quarterList);
+                activeMemberNumberOption.series[0].data = Array.from(data.activeMemberNumberList);
+            }
+            activeMemberNumberChart.setOption(activeMemberNumberOption);
+        }
+    });
+
+    var activeVenueNumberChart = echarts.init(document.getElementById('activeVenueNumber'));
+    var activeVenueNumberOption = {
+        title: {
+            text: '活跃场馆数量变化'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 个'
+            }
+        },
+        series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line'
+        }]
+    };
+    $.ajax({
+        url: '/manager/activeVenueNumber',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            // alert(JSON.stringify(data));
+            if (data.result) {
+                activeVenueNumberOption.xAxis.data = Array.from(data.quarterList);
+                activeVenueNumberOption.series[0].data = Array.from(data.activeVenueNumberList);
+            }
+            // alert(activeVenueNumberOption.xAxis.data);
+            activeVenueNumberChart.setOption(activeVenueNumberOption);
+        }
+    });
+
+</script>
 </body>
 </html>

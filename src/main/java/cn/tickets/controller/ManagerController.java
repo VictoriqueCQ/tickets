@@ -77,4 +77,34 @@ public class ManagerController {
         model.addAttribute("managementAnalysis",managerService.analysis(model));
         return "manager/analysis";
     }
+
+    @RequestMapping("/venueProfitRatio")
+    @ResponseBody
+    public Map<String, Object> venueProfitRatio(){
+        return managerService.venueProfitRatio();
+    }
+
+    @RequestMapping("/activityProfitRatio")
+    @ResponseBody
+    public Map<String,Object> activityProfitRatio(){
+        return managerService.activityProfitRatio();
+    }
+
+    @RequestMapping("/profitChange")
+    @ResponseBody
+    public Map<String,Object> profitChange(){
+        return managerService.profitChange();
+    }
+
+    @RequestMapping("/activeMemberNumber")
+    @ResponseBody
+    public Map<String,Object> activeMemberNumber(){
+        return managerService.activeMemberNumber();
+    }
+
+    @RequestMapping("/activeVenueNumber")
+    @ResponseBody
+    public Map<String,Object> activeVenueNumber(){
+        return managerService.activeVenueNumber();
+    }
 }

@@ -214,7 +214,7 @@ public class ManagerServiceImpl implements ManagerService {
         String fourthSeatingRatio = getSeatingRatio(4);
         List<ConsumptionEntity> allConsumLastYear = consumptionRepository.allConsumptionLastYear();
         int allProfitLastYear = 0;
-        for(ConsumptionEntity consumptionEntity:allConsumLastYear){
+        for (ConsumptionEntity consumptionEntity : allConsumLastYear) {
             allProfitLastYear += consumptionEntity.getAprice();
         }
         ManagementAnalysisVO managementAnalysisVO = new ManagementAnalysisVO();
@@ -222,11 +222,12 @@ public class ManagerServiceImpl implements ManagerService {
         managementAnalysisVO.setSecondSR(secondSeatingRatio);
         managementAnalysisVO.setThirdSR(thirdSeatingRatio);
         managementAnalysisVO.setFourthSR(fourthSeatingRatio);
-        String aplyStr = allProfitLastYear+"元";
+        String aplyStr = allProfitLastYear + "元";
         managementAnalysisVO.setAllProfitLastYear(aplyStr);
         System.err.println(managementAnalysisVO.toString());
         return managementAnalysisVO;
     }
+
 
     String getSeatingRatio(int num) {
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -242,7 +243,7 @@ public class ManagerServiceImpl implements ManagerService {
             consumLastQuarter = consumptionRepository.allConsumptionLastFourthQuarter();
         }
 
-        if(consumLastQuarter.size()!=0){
+        if (consumLastQuarter.size() != 0) {
             Map<Integer, List<String>> activityLastQuarter = new HashMap<>();
             //按场馆获得所有活动日期
             for (ConsumptionEntity consumptionEntity : consumLastQuarter) {
@@ -275,11 +276,189 @@ public class ManagerServiceImpl implements ManagerService {
             DecimalFormat df2 = new DecimalFormat("0.0");
             String seatingRatio = df2.format((double) hasSeatedNumber / allSeatNumber * 100) + "%";
             srStr = seatingRatio;
-        }else{
+        } else {
             srStr = "0.0%";
         }
         return srStr;
     }
 
+    @Override
+    public Map<String, Object> venueProfitRatio() {
+        Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> consumLastYear = consumptionRepository.allConsumptionLastYear();
+        List<Integer> venueList = new ArrayList<>();
+        for (ConsumptionEntity consumptionEntity : consumLastYear) {
+            int id = consumptionEntity.getVid();
+            if (!venueList.contains(id)) {
+                venueList.add(id);
+            }
+        }
+        List<Integer> profitList = new ArrayList<>();
+        for (int vid : venueList) {
+            int profit = 0;
+            for (ConsumptionEntity consumptionEntity : consumLastYear) {
+                if (consumptionEntity.getVid() == vid) {
+                    profit += consumptionEntity.getAprice();
+                }
+            }
+            profitList.add(profit);
+        }
+        List<String> venueNameList = new ArrayList<>();
+        for (int vid : venueList) {
+            VenueEntity venueEntity = venueRepository.findById(vid);
+            venueNameList.add(venueEntity.getName());
+        }
+        result.put("venueNameList", venueNameList);
+        result.put("profitList", profitList);
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
 
+    @Override
+    public Map<String, Object> activityProfitRatio() {
+        Map<String, Object> result = new TreeMap<>();
+        List<ConsumptionEntity> consumLastYear = consumptionRepository.allConsumptionLastYear();
+        List<String> typeList = new ArrayList<>();
+        for (ConsumptionEntity consumptionEntity : consumLastYear) {
+            String type = consumptionEntity.getType();
+            if(!typeList.contains(type)){
+                typeList.add(type);
+            }
+        }
+        List<Integer> profitList = new ArrayList<>();
+        for(String type:typeList){
+            int profit = 0;
+            for(ConsumptionEntity consumptionEntity:consumLastYear){
+                if(consumptionEntity.getType().equals(type)){
+                    profit += consumptionEntity.getAprice();
+                }
+            }
+            profitList.add(profit);
+        }
+        result.put("typeList",typeList);
+        result.put("profitList",profitList);
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> profitChange(){
+        Map<String,Object> result = new TreeMap<>();
+        List<ConsumptionEntity> consumFirstQuarter = consumptionRepository.allConsumptionLastQuarter();
+        List<ConsumptionEntity> consumSecondQuarter = consumptionRepository.allConsumptionLastSecondQuarter();
+        List<ConsumptionEntity> consumThirdQuarter = consumptionRepository.allConsumptionLastThirdQuarter();
+        List<ConsumptionEntity> consumFourthQuarter = consumptionRepository.allConsumptionLastFourthQuarter();
+        List<String> quarterList = getQuarter();
+        List<Integer> profitList = new ArrayList<>();
+        profitList.add(getQuarterProfit(consumFirstQuarter));
+        profitList.add(getQuarterProfit(consumSecondQuarter));
+        profitList.add(getQuarterProfit(consumThirdQuarter));
+        profitList.add(getQuarterProfit(consumFourthQuarter));
+        result.put("quarterList",quarterList);
+        result.put("profitList",profitList);
+        result.put(Default.HTTP_RESULT,true);
+        return result;
+    }
+
+    //获得季度收益
+    int getQuarterProfit(List<ConsumptionEntity> list){
+        if(list.size()>0){
+            int profit = 0;
+            for(ConsumptionEntity consumptionEntity:list){
+                profit += consumptionEntity.getAprice();
+            }
+            return profit;
+        }else{
+            return 0;
+        }
+    }
+    //获得季度
+    List<String> getQuarter(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        for (int i = 0; i < 12; i++) {
+            Date m = c.getTime();
+            monthList.add(sdf.format(m));
+            c.add(Calendar.MONTH, -1);
+        }
+        List<String> quarterList = new ArrayList<>();
+        for(int i = 0;i<12;i=i+3){
+            String quarter = monthList.get(i)+"~"+monthList.get(i+2);
+            quarterList.add(quarter);
+        }
+        return quarterList;
+    }
+
+    @Override
+    public Map<String, Object> activeMemberNumber() {
+        Map<String,Object> result = new TreeMap<>();
+        List<ConsumptionEntity> consumFirstQuarter = consumptionRepository.allConsumptionLastQuarter();
+        List<ConsumptionEntity> consumSecondQuarter = consumptionRepository.allConsumptionLastSecondQuarter();
+        List<ConsumptionEntity> consumThirdQuarter = consumptionRepository.allConsumptionLastThirdQuarter();
+        List<ConsumptionEntity> consumFourthQuarter = consumptionRepository.allConsumptionLastFourthQuarter();
+        List<String> quarterList = getQuarter();
+        List<Integer> activeMemberNumberList = new ArrayList<>();
+        activeMemberNumberList.add(getActiveMemberNumber(consumFirstQuarter));
+        activeMemberNumberList.add(getActiveMemberNumber(consumSecondQuarter));
+        activeMemberNumberList.add(getActiveMemberNumber(consumThirdQuarter));
+        activeMemberNumberList.add(getActiveMemberNumber(consumFourthQuarter));
+        result.put("quarterList",quarterList);
+        result.put("activeMemberNumberList",activeMemberNumberList);
+        result.put(Default.HTTP_RESULT,true);
+        return result;
+    }
+
+    int getActiveMemberNumber(List<ConsumptionEntity> list){
+        List<Integer> memberList = new ArrayList<>();
+        if(list.size()>0){
+            int number = 0;
+            for(ConsumptionEntity consumptionEntity:list){
+                int mid = consumptionEntity.getMid();
+                if(!memberList.contains(mid)){
+                    memberList.add(mid);
+                }
+            }
+            return memberList.size();
+        }else{
+            return 0;
+        }
+    }
+
+    @Override
+    public Map<String, Object> activeVenueNumber() {
+        Map<String,Object> result = new TreeMap<>();
+        List<ConsumptionEntity> consumFirstQuarter = consumptionRepository.allConsumptionLastQuarter();
+        List<ConsumptionEntity> consumSecondQuarter = consumptionRepository.allConsumptionLastSecondQuarter();
+        List<ConsumptionEntity> consumThirdQuarter = consumptionRepository.allConsumptionLastThirdQuarter();
+        List<ConsumptionEntity> consumFourthQuarter = consumptionRepository.allConsumptionLastFourthQuarter();
+        List<String> quarterList = getQuarter();
+        List<Integer> activeVenueNumberList = new ArrayList<>();
+        activeVenueNumberList.add(getActiveVenueNumber(consumFirstQuarter));
+        activeVenueNumberList.add(getActiveVenueNumber(consumSecondQuarter));
+        activeVenueNumberList.add(getActiveVenueNumber(consumThirdQuarter));
+        activeVenueNumberList.add(getActiveVenueNumber(consumFourthQuarter));
+        result.put("quarterList",quarterList);
+        result.put("activeVenueNumberList",activeVenueNumberList);
+        result.put(Default.HTTP_RESULT,true);
+        System.err.println(activeVenueNumberList);
+        return result;
+    }
+
+    int getActiveVenueNumber(List<ConsumptionEntity> list){
+        List<Integer> venueList = new ArrayList<>();
+        if(list.size()>0){
+            int number = 0;
+            for(ConsumptionEntity consumptionEntity:list){
+                int vid = consumptionEntity.getVid();
+                if(!venueList.contains(vid)){
+                   venueList.add(vid);
+                }
+            }
+            return venueList.size();
+        }else{
+            return 0;
+        }
+    }
 }

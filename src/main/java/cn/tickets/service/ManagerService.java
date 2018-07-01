@@ -27,4 +27,9 @@ public interface ManagerService {
 
     //以下是管理信息系统新增代码
     ManagementAnalysisVO analysis(Model model);
+    Map<String,Object>venueProfitRatio();
+    Map<String,Object>activityProfitRatio();
+    Map<String,Object>profitChange();
+    Map<String,Object>activeMemberNumber();
+    Map<String,Object>activeVenueNumber();
 }
