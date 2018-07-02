@@ -11,6 +11,7 @@ import cn.tickets.repository.VenueRepository;
 import cn.tickets.service.ManagerService;
 import cn.tickets.util.Default;
 import cn.tickets.vo.ManagementAnalysisVO;
+import cn.tickets.vo.MemberOrderAnalysisVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -546,15 +547,100 @@ public class ManagerServiceImpl implements ManagerService {
                     }
                 }
             }
-            for(int i =0;i<numberArray.length;i++){
+            for (int i = 0; i < numberArray.length; i++) {
                 numberList.add(numberArray[i]);
             }
             allNumberList.add(numberList);
         }
-        result.put("monthList",monthList);
-        result.put("allNumberList",allNumberList);
-        result.put("activityTypeList",activityTypeList);
-        result.put(Default.HTTP_RESULT,true);
+        result.put("monthList", monthList);
+        result.put("allNumberList", allNumberList);
+        result.put("activityTypeList", activityTypeList);
+        result.put(Default.HTTP_RESULT, true);
         return result;
     }
+
+    @Override
+    public List<MemberOrderAnalysisVO> memberOrder(Model model) {
+        List<MemberOrderAnalysisVO> memberOrderAnalysisVOS = new ArrayList<>();
+        List<ConsumptionEntity> allConsumLastYear = consumptionRepository.consumpLastYear();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+//        int[] numberArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//        List<Integer> numberList = new ArrayList<>(12);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 12; i++) {
+
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+
+//        int[][] memberOrderAnalysisArray = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+        for (int i = 0; i < monthList.size(); i++) {
+            DecimalFormat df2 = new DecimalFormat("0.0");
+            int refundOrderNumber = 0, orderNumber = 0, orderPriceSum = 0;
+            for (ConsumptionEntity consumptionEntity : allConsumLastYear) {
+                String orderdate = consumptionEntity.getOrderdate().toString();
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    if (consumptionEntity.getPredefine() == 0) {
+                        refundOrderNumber++;
+                    } else {
+                        orderNumber++;
+                        orderPriceSum += consumptionEntity.getAprice();
+                    }
+                }
+            }
+            System.err.println("refundOrderNumber:" + refundOrderNumber + " " + "orderNumber:" + orderNumber + " " + "orderPriceProfit:" + orderPriceSum);
+            double refund = 0.0;
+            if (orderNumber + refundOrderNumber == 0) {
+                refund = 0.0;
+            } else {
+                refund = (double) refundOrderNumber / (orderNumber + refundOrderNumber) * 100;
+            }
+            String refundRatio = df2.format(refund) + "%";
+            int average = 0;
+            if (orderNumber == 0) {
+                average = 0;
+            } else {
+                average = orderPriceSum / orderNumber;
+            }
+
+            MemberOrderAnalysisVO memberOrderAnalysisVO = new MemberOrderAnalysisVO();
+            memberOrderAnalysisVO.setRefund(refundRatio);
+            memberOrderAnalysisVO.setAverage(average);
+            memberOrderAnalysisVO.setMonth(monthList.get(i));
+            System.err.println(memberOrderAnalysisVO);
+            memberOrderAnalysisVOS.add(memberOrderAnalysisVO);
+        }
+        return memberOrderAnalysisVOS;
+    }
+
+    @Override
+    public List<String> venueDetails(Model model){
+        List<String> venueNameList = new ArrayList<>();
+        List<ConsumptionEntity> consumLastYear = consumptionRepository.consumpLastYear();
+        List<Integer> vidList = new ArrayList<>();
+        for(ConsumptionEntity consumptionEntity:consumLastYear){
+            int vid = consumptionEntity.getVid();
+            if(!vidList.contains(vid)){
+                vidList.add(vid);
+            }
+        }
+        for(int vid:vidList){
+            VenueEntity venueEntity = venueRepository.findById(vid);
+            venueNameList.add(venueEntity.getName());
+        }
+        System.err.println(venueNameList.toString());
+        return venueNameList;
+    }
+
+
 }

@@ -75,6 +75,8 @@ public class ManagerController {
     @RequestMapping("/analysis")
     public String analysis(Model model) {
         model.addAttribute("managementAnalysis", managerService.analysis(model));
+        model.addAttribute("MemberOrder",managerService.memberOrder(model));
+        model.addAttribute("venueDetails",managerService.venueDetails(model));
         return "manager/analysis";
     }
 
@@ -119,4 +121,6 @@ public class ManagerController {
     public Map<String,Object> activityMonth(){
         return managerService.activityMonth();
     }
+
+
 }

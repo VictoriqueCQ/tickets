@@ -82,11 +82,13 @@
         <div class="col-md-12">
             <div id="profitChange" class="col-md-8" style="height: 450px;width: 750px;">过去一年Tickets平台收益变化</div>
             <div class="col-md-4" style="height:450px;width: 450px;">
+                <br/>
+                <br/>
                 <div class="panel panel-info">
-                    <div class="panel-heading">具体活动</div>
-                    <table class="table table-hover" id="VenueTable">
-                        <tr th:each="activity:${}">
-                            <td class="activityType" th:text="${activity}" style="width: 50%;">场馆a</td>
+                    <div class="panel-heading">具体场馆</div>
+                    <table class="table table-hover" id="venueTable">
+                        <tr th:each="venue:${venueDetails}">
+                            <td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>
                             <td style="width: 50%">
                                 <button class="details">查看详情</button>
                             </td>
@@ -123,20 +125,21 @@
         <div class="col-md-12">
 
             <div class="col-md-6">
-                <h5>过去一年</h5>
-                <h5>所有会员退款率、订单平均单价</h5>
+                <br/>
+                <br/>
                 <div class="panel panel-info">
-                    <div class="panel-heading">具体活动</div>
+                    <div class="panel-heading">过去一年所有会员退款率、订单平均单价</div>
                     <table class="table table-hover" id="MemberTable1">
                         <thead>
-
+                            <td>月份</td>
+                            <td>退款率</td>
+                            <td>订单平均单价（单位：元）</td>
                         </thead>
                         <tbody>
                         <tr th:each="member:${MemberOrder}">
-                            <td class="refund" th:text="${member.refund}" style="width: 50%;">退款率</td>
-                            <td class="average" th:text="${member.average}" style="width: 50%">
-
-                            </td>
+                            <td class="month" th:text="${member.month}" style="width: 30%"></td>
+                            <td class="refund" th:text="${member.refund}" style="width: 30%;">退款率</td>
+                            <td class="average" th:text="${member.average}" style="width: 40%">订单单价</td>
                         </tr>
                         </tbody>
 
@@ -165,6 +168,21 @@
 <script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
+
+    $('.details').on('click', function () {
+        var type = $(this).parents("tr").find(".venueName").text();
+        var inputs = {type:type};
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/manager/getVenueProfit",
+            data: inputs,
+            dataType: "json",
+            success: function (data) {
+                window.location.href = "details.html";
+            }
+        })
+
+    });
 
     var venueProfitRatioChart = echarts.init(document.getElementById("venueProfitRatio"));
     var venueProfitRatioOption = {
@@ -295,6 +313,9 @@
 
     var profitChangeChart = echarts.init(document.getElementById('profitChange'));
     var profitChangeOption = {
+        title:{
+            text:'过去一年Tickets平台收益变化'
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
@@ -506,11 +527,11 @@
         data: '',
         dataType: 'json',
         success: function (data) {
-            alert(JSON.stringify(data));
+            // alert(JSON.stringify(data));
             // console.log(data);
             if (data.result) {
                 activityMonthOption.xAxis[0].data = Array.from(data.monthList);
-                alert(activityMonthOption.xAxis.data);
+                // alert(activityMonthOption.xAxis.data);
                 for (var i = 0; i != data.activityTypeList.length; i++) {
                     activityMonthOption.series[i].name = data.activityTypeList[i];
                     activityMonthOption.series[i].data = Array.from(data.allNumberList[i]);
@@ -522,7 +543,7 @@
                 // activityMonthOption.series[2].name = data.activityTypeList[2];
                 // activityMonthOption.series[2].data = Array.from(data.allNumberList[2]);
             }
-            alert(JSON.stringify(activityMonthOption.series));
+            // alert(JSON.stringify(activityMonthOption.series));
             activityMonthChart.setOption(activityMonthOption);
 
         }

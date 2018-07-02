@@ -5,6 +5,7 @@ import cn.tickets.entity.MemberEntity;
 import cn.tickets.entity.VenueEntity;
 import cn.tickets.vo.ManagementAnalysisVO;
 import cn.tickets.vo.MemberInfoVO;
+import cn.tickets.vo.MemberOrderAnalysisVO;
 import org.springframework.ui.Model;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public interface ManagerService {
     Map<String,Object>activeVenueNumber();
     Map<String,Object>orderMonth();
     Map<String,Object>activityMonth();
+    List<MemberOrderAnalysisVO> memberOrder(Model model);
+    List<String> venueDetails(Model model);
 }
