@@ -85,12 +85,12 @@
                 <div class="panel panel-info">
                     <div class="panel-heading">具体活动</div>
                     <table class="table table-hover" id="VenueTable">
-                        <!--<tr th:each="venue:${managerAnalysis}">-->
-                        <!--<td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>-->
-                        <!--<td style="width: 50%">-->
-                        <!--<button class="details">查看详情</button>-->
-                        <!--</td>-->
-                        <!--</tr>-->
+                        <tr th:each="activity:${}">
+                            <td class="activityType" th:text="${activity}" style="width: 50%;">场馆a</td>
+                            <td style="width: 50%">
+                                <button class="details">查看详情</button>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -108,31 +108,47 @@
 
 
         <h1>会员情况分析</h1>
-        <div class="col-md-12">
-            <div class="col-md-6">
-                <h5>过去一年</h5>
-                <h5>所有会员退款率</h5>
-                <div id="refundRatio" style="height:300px;width: 600px;"></div>
-            </div>
-            <div>
-                <h5>过去一年</h5>
-                <h5>活跃会员比例</h5>
-                <div id="activityMemberRatio" class="col-md-6" style="height:300px;width: 600px;"></div>
-            </div>
-        </div>
+        <!--<div class="col-md-12">-->
+        <!--<div class="col-md-6">-->
+        <!--<h5>过去一年</h5>-->
+        <!--<h5>所有会员退款率</h5>-->
+        <!--<div id="refundRatio" style="height:300px;width: 600px;"></div>-->
+        <!--</div>-->
+        <!--<div>-->
+        <!--<h5>过去一年</h5>-->
+        <!--<h5>活跃会员比例</h5>-->
+        <!--<div id="activityMemberRatio" class="col-md-6" style="height:300px;width: 600px;"></div>-->
+        <!--</div>-->
+        <!--</div>-->
         <div class="col-md-12">
 
             <div class="col-md-6">
                 <h5>过去一年</h5>
-                <h5>所有会员订单平均单价</h5>
-                <div id="averagePrice" style="height:450px;width: 750px;"></div>
+                <h5>所有会员退款率、订单平均单价</h5>
+                <div class="panel panel-info">
+                    <div class="panel-heading">具体活动</div>
+                    <table class="table table-hover" id="MemberTable1">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                        <tr th:each="member:${MemberOrder}">
+                            <td class="refund" th:text="${member.refund}" style="width: 50%;">退款率</td>
+                            <td class="average" th:text="${member.average}" style="width: 50%">
+
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
-            <div class="col-md-4" style="height:450px;width: 450px;">
+            <div class="col-md-6" style="height:450px;width: 450px;">
                 <br/>
                 <br/>
                 <div class="panel panel-info">
                     <div class="panel-heading">具体活动</div>
-                    <table class="table table-hover" id="MemberTable">
+                    <table class="table table-hover" id="MemberTable2">
                         <!--<tr th:each="member:${managerAnalysis}">-->
                         <!--<td class="venueName" th:text="${member}" style="width: 50%;">场馆a</td>-->
                         <!--<td style="width: 50%">-->
@@ -398,6 +414,117 @@
                 activeVenueNumberOption.series[0].data = Array.from(data.activeVenueNumberList);
             }
             activeVenueNumberChart.setOption(activeVenueNumberOption);
+        }
+    });
+
+    var orderMonthChart = echarts.init(document.getElementById('order-month'));
+    var orderMonthOption = {
+        title: {
+            text: '活跃场馆数量变化'
+        },
+        xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            interval: 1,
+            axisLabel: {
+                formatter: '{value} 个'
+            }
+        },
+        series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line'
+        }]
+    };
+    $.ajax({
+        url: '/manager/orderMonth',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                orderMonthOption.xAxis.data = Array.from(data.monthList);
+                orderMonthOption.series[0].data = Array.from(data.numberList);
+            }
+            orderMonthChart.setOption(orderMonthOption);
+        }
+    });
+
+
+    var activityMonthChart = echarts.init(document.getElementById('activityType-month'));
+    var activityMonthOption = {
+        title: {
+            text: '不同活动类型数量变化'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: ['直接访问', '邮件营销', '联盟广告']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '直接访问',
+                type: 'bar',
+                data: [320, 332, 301, 334, 390, 330, 320]
+            },
+            {
+                name: '邮件营销',
+                type: 'bar',
+                data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: '联盟广告',
+                type: 'bar',
+                data: [220, 182, 191, 234, 290, 330, 310]
+            }
+        ]
+    };
+    $.ajax({
+        url: '/manager/activityMonth',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            alert(JSON.stringify(data));
+            // console.log(data);
+            if (data.result) {
+                activityMonthOption.xAxis[0].data = Array.from(data.monthList);
+                alert(activityMonthOption.xAxis.data);
+                for (var i = 0; i != data.activityTypeList.length; i++) {
+                    activityMonthOption.series[i].name = data.activityTypeList[i];
+                    activityMonthOption.series[i].data = Array.from(data.allNumberList[i]);
+                }
+                // activityMonthOption.series[0].name = data.activityTypeList[0];
+                // activityMonthOption.series[0].data = Array.from(data.allNumberList[0]);
+                // activityMonthOption.series[1].name = data.activityTypeList[1];
+                // activityMonthOption.series[1].data = Array.from(data.allNumberList[1]);
+                // activityMonthOption.series[2].name = data.activityTypeList[2];
+                // activityMonthOption.series[2].data = Array.from(data.allNumberList[2]);
+            }
+            alert(JSON.stringify(activityMonthOption.series));
+            activityMonthChart.setOption(activityMonthOption);
+
         }
     });
 

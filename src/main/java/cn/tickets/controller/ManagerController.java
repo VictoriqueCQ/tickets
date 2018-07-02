@@ -27,9 +27,9 @@ public class ManagerController {
     }
 
 
-    @RequestMapping(value = "/approve",method = RequestMethod.POST)
+    @RequestMapping(value = "/approve", method = RequestMethod.POST)
     @ResponseBody
-    public boolean approve(int vid, int approve){
+    public boolean approve(int vid, int approve) {
         return managerService.approve(vid, approve);
     }
 
@@ -53,58 +53,70 @@ public class ManagerController {
     }
 
 
-    @RequestMapping({"/","/index"})
-    public String index(Model model){
-        model.addAttribute("opens",managerService.getAllOpenApplication());
-        model.addAttribute("edits",managerService.getAllModifyApplication());
+    @RequestMapping({"/", "/index"})
+    public String index(Model model) {
+        model.addAttribute("opens", managerService.getAllOpenApplication());
+        model.addAttribute("edits", managerService.getAllModifyApplication());
         return "manager/index";
     }
 
     @RequestMapping("/settlement")
-    public String settlement(){
+    public String settlement() {
         return "manager/settlement";
     }
 
     @RequestMapping("/getsettlement")
     @ResponseBody
-    public Map<String,Object> getSettlement(){
+    public Map<String, Object> getSettlement() {
         return managerService.getSettlement();
     }
 
     //以下是管理信息系统作业新增代码
     @RequestMapping("/analysis")
     public String analysis(Model model) {
-        model.addAttribute("managementAnalysis",managerService.analysis(model));
+        model.addAttribute("managementAnalysis", managerService.analysis(model));
         return "manager/analysis";
     }
 
     @RequestMapping("/venueProfitRatio")
     @ResponseBody
-    public Map<String, Object> venueProfitRatio(){
+    public Map<String, Object> venueProfitRatio() {
         return managerService.venueProfitRatio();
     }
 
     @RequestMapping("/activityProfitRatio")
     @ResponseBody
-    public Map<String,Object> activityProfitRatio(){
+    public Map<String, Object> activityProfitRatio() {
         return managerService.activityProfitRatio();
     }
 
     @RequestMapping("/profitChange")
     @ResponseBody
-    public Map<String,Object> profitChange(){
+    public Map<String, Object> profitChange() {
         return managerService.profitChange();
     }
 
     @RequestMapping("/activeMemberNumber")
     @ResponseBody
-    public Map<String,Object> activeMemberNumber(){
+    public Map<String, Object> activeMemberNumber() {
         return managerService.activeMemberNumber();
     }
 
     @RequestMapping("/activeVenueNumber")
     @ResponseBody
-    public Map<String,Object> activeVenueNumber(){
+    public Map<String, Object> activeVenueNumber() {
         return managerService.activeVenueNumber();
+    }
+
+    @RequestMapping("/orderMonth")
+    @ResponseBody
+    public Map<String, Object> orderMonth(){
+        return managerService.orderMonth();
+    }
+
+    @RequestMapping("/activityMonth")
+    @ResponseBody
+    public Map<String,Object> activityMonth(){
+        return managerService.activityMonth();
     }
 }

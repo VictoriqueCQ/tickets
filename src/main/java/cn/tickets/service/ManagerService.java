@@ -32,4 +32,6 @@ public interface ManagerService {
     Map<String,Object>profitChange();
     Map<String,Object>activeMemberNumber();
     Map<String,Object>activeVenueNumber();
+    Map<String,Object>orderMonth();
+    Map<String,Object>activityMonth();
 }
