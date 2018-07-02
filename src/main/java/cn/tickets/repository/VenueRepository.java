@@ -27,4 +27,7 @@ public interface VenueRepository extends JpaRepository<VenueEntity, Integer> {
 
     VenueEntity findById(int id);
 
+    //管理信息系统新增代码
+    VenueEntity findByName(String name);
+
 }

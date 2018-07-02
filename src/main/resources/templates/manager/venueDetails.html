@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1"/>-->
+    <link rel="stylesheet" href="../../static/css/bootstrap.min.css" th:href="@{../../static/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/bootstrap-theme.min.css"
+          th:href="@{../../static/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" href="../../static/css/tickets.css" th:href="@{../../static/css/tickets.css}"/>
+    <link rel="stylesheet" href="../../static/css/other.css" th:href="@{../../static/css/other.css}"/>
+    <script src="../../static/js/echarts.min.js" th:src="@{../../static/js/echarts.min.js}"></script>
+    <title>场馆详情</title>
+</head>
+<body>
+<h1>这是场馆详情</h1>
+<div class="mainpage">
+    <div class="container-fluid">
+        <h1>过去四个季度本场馆收益变化</h1>
+        <div id="profitChange" style="width: 1600px;height: 900px">
+        </div>
+    </div>
+</div>
+
+<script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
+<script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    var profitChangeChart = echarts.init(document.getElementById('profitChange'));
+    var profitChangeOption = {
+        // title:{
+        //     text:'过去一年Tickets平台收益变化'
+        // },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: ['消费金额']
+        },
+        grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '10%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                name: 'Time',
+                type: 'category',
+                data: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",]
+            }
+        ],
+        yAxis: [
+            {
+                name: 'Consumption',
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '消费金额',
+                type: 'bar',
+                stack: 'Day Income',
+                data: [620, 732, 701, 734, 1090, 1130, 1120, 732, 701, 734, 1090, 1130]
+            }
+        ]
+    };
+
+    $.ajax({
+        url: '/manager/venueProfitChange',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            // alert(JSON.stringify(data));
+            if (data.result) {
+
+                profitChangeOption.xAxis[0].data = Object.keys(data.monthList).map(function (k) {
+                    return data.monthList[k]
+                });
+                profitChangeOption.series[0].data = Array.from(data.moneyList);
+                profitChangeChart.setOption(profitChangeOption);
+            }
+        }
+    });
+
+
+</script>
+</body>
+</html>

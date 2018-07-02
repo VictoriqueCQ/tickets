@@ -7,19 +7,24 @@ import cn.tickets.service.ConsumptionService;
 import cn.tickets.service.ManagerService;
 import cn.tickets.service.MemberService;
 import cn.tickets.service.VenueService;
+import cn.tickets.util.Default;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.GeneratedValue;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Controller
 @RequestMapping(value = "/manager")
 public class ManagerController {
 
     private ManagerService managerService;
+    public static String venueName;
+    public static String memberName;
 
     public ManagerController(ManagerService managerService) {
         this.managerService = managerService;
@@ -77,6 +82,7 @@ public class ManagerController {
         model.addAttribute("managementAnalysis", managerService.analysis(model));
         model.addAttribute("MemberOrder",managerService.memberOrder(model));
         model.addAttribute("venueDetails",managerService.venueDetails(model));
+        model.addAttribute("memberDetails",managerService.memberDetails(model));
         return "manager/analysis";
     }
 
@@ -122,5 +128,41 @@ public class ManagerController {
         return managerService.activityMonth();
     }
 
+    @RequestMapping("/getVenueDetails")
+    @ResponseBody
+    public Map<String,Object> getVenueDetails(String type){
+        Map<String,Object> result = new TreeMap<>();
+        this.venueName = type;
+        result.put(Default.HTTP_RESULT,true);
+        return result;
+    }
 
+    @RequestMapping("/getMemberDetails")
+    @ResponseBody
+    public Map<String,Object> getMemberDetails(String type){
+        Map<String,Object> result = new TreeMap<>();
+        this.memberName = type;
+        result.put(Default.HTTP_RESULT,true);
+        return result;
+    }
+
+    @RequestMapping("/memberDetails")
+    public String memberDetails(Model model){
+        String memberName = this.memberName;
+//        model.addAttribute("memberDetails",managerService.memberDetails(memberName));
+        return "manager/memberDetails";
+    }
+
+    @RequestMapping("/venueDetails")
+    public String venueDetails(){
+        String venueName = this.venueName;
+        return "manager/venueDetails";
+    }
+
+    @RequestMapping("/venueProfitChange")
+    @ResponseBody
+    public Map<String,Object> venueProfitChange(){
+        System.err.println("venueName:"+venueName);
+        return managerService.venueProfitChange(venueName);
+    }
 }

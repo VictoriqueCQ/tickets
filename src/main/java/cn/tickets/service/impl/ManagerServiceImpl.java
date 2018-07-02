@@ -583,7 +583,6 @@ public class ManagerServiceImpl implements ManagerService {
             c2.add(Calendar.MONTH, -1);
         }
 
-//        int[][] memberOrderAnalysisArray = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
         for (int i = 0; i < monthList.size(); i++) {
             DecimalFormat df2 = new DecimalFormat("0.0");
             int refundOrderNumber = 0, orderNumber = 0, orderPriceSum = 0;
@@ -624,17 +623,17 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public List<String> venueDetails(Model model){
+    public List<String> venueDetails(Model model) {
         List<String> venueNameList = new ArrayList<>();
         List<ConsumptionEntity> consumLastYear = consumptionRepository.consumpLastYear();
         List<Integer> vidList = new ArrayList<>();
-        for(ConsumptionEntity consumptionEntity:consumLastYear){
+        for (ConsumptionEntity consumptionEntity : consumLastYear) {
             int vid = consumptionEntity.getVid();
-            if(!vidList.contains(vid)){
+            if (!vidList.contains(vid)) {
                 vidList.add(vid);
             }
         }
-        for(int vid:vidList){
+        for (int vid : vidList) {
             VenueEntity venueEntity = venueRepository.findById(vid);
             venueNameList.add(venueEntity.getName());
         }
@@ -642,5 +641,66 @@ public class ManagerServiceImpl implements ManagerService {
         return venueNameList;
     }
 
+    @Override
+    public List<String> memberDetails(Model model) {
+        List<String> memberNameList = new ArrayList<>();
+        List<ConsumptionEntity> consumLastYear = consumptionRepository.consumpLastYear();
+        List<Integer> midList = new ArrayList<>();
+        for (ConsumptionEntity consumptionEntity : consumLastYear) {
+            int mid = consumptionEntity.getMid();
+            if (!midList.contains(mid)) {
+                midList.add(mid);
+            }
+        }
+        for (int mid : midList) {
+            MemberEntity memberEntity = memberRepository.findOne(mid);
+            memberNameList.add(memberEntity.getName());
+        }
+        System.err.println(memberNameList.toString());
+        return memberNameList;
+    }
+
+    @Override
+    public Map<String, Object> venueProfitChange(String venueName) {
+        Map<String, Object> result = new TreeMap<>();
+        VenueEntity venueEntity = venueRepository.findByName(venueName);
+        List<ConsumptionEntity> allConsumLastYear = consumptionRepository.venueConsumptionLastYear(venueEntity.getId());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(12);
+        List<String> monthList2 = new ArrayList<>(12);
+        int[] moneyArray = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        List<Integer> moneyList = new ArrayList<>(12);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 12; i++) {
+
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+        for (ConsumptionEntity consumptionEntity : allConsumLastYear) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < monthList.size(); i++) {
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    moneyArray[i] += consumptionEntity.getAprice();
+                }
+            }
+        }
+        for (int i = 0; i < moneyArray.length; i++) {
+            moneyList.add(moneyArray[i]);
+        }
+        result.put("moneyList",moneyList);
+        result.put("monthList",monthList);
+        System.err.println(moneyList.toString());
+        System.err.println(monthList.toString());
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
 
 }

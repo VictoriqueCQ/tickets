@@ -80,7 +80,7 @@
         </div>
 
         <div class="col-md-12">
-            <div id="profitChange" class="col-md-8" style="height: 450px;width: 750px;">过去一年Tickets平台收益变化</div>
+            <div id="profitChange" class="col-md-8" style="height: 450px;width: 750px;">过去四个季度Tickets平台收益变化</div>
             <div class="col-md-4" style="height:450px;width: 450px;">
                 <br/>
                 <br/>
@@ -90,7 +90,7 @@
                         <tr th:each="venue:${venueDetails}">
                             <td class="venueName" th:text="${venue}" style="width: 50%;">场馆a</td>
                             <td style="width: 50%">
-                                <button class="details">查看详情</button>
+                                <button class="venueDetails">查看详情</button>
                             </td>
                         </tr>
                     </table>
@@ -128,7 +128,7 @@
                 <br/>
                 <br/>
                 <div class="panel panel-info">
-                    <div class="panel-heading">过去一年所有会员退款率、订单平均单价</div>
+                    <div class="panel-heading">过去12个月所有会员退款率、订单平均单价</div>
                     <table class="table table-hover" id="MemberTable1">
                         <thead>
                             <td>月份</td>
@@ -150,14 +150,14 @@
                 <br/>
                 <br/>
                 <div class="panel panel-info">
-                    <div class="panel-heading">具体活动</div>
-                    <table class="table table-hover" id="MemberTable2">
-                        <!--<tr th:each="member:${managerAnalysis}">-->
-                        <!--<td class="venueName" th:text="${member}" style="width: 50%;">场馆a</td>-->
-                        <!--<td style="width: 50%">-->
-                        <!--<button class="details">查看详情</button>-->
-                        <!--</td>-->
-                        <!--</tr>-->
+                    <div class="panel-heading">具体场馆</div>
+                    <table class="table table-hover" id="memberTable">
+                        <tr th:each="member:${memberDetails}">
+                            <td class="memberName" th:text="${member}" style="width: 50%;">场馆a</td>
+                            <td style="width: 50%">
+                                <button class="memberDetails">查看详情</button>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -169,16 +169,31 @@
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
 <script type="text/javascript" th:inline="javascript">
 
-    $('.details').on('click', function () {
+    $('.venueDetails').on('click', function () {
         var type = $(this).parents("tr").find(".venueName").text();
         var inputs = {type:type};
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/manager/getVenueProfit",
+            url: "http://localhost:8080/manager/getVenueDetails",
             data: inputs,
             dataType: "json",
             success: function (data) {
-                window.location.href = "details.html";
+                window.location.href = "venueDetails.html";
+            }
+        })
+
+    });
+
+    $('.memberDetails').on('click', function () {
+        var type = $(this).parents("tr").find(".memberName").text();
+        var inputs = {type:type};
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/manager/getMemberDetails",
+            data: inputs,
+            dataType: "json",
+            success: function (data) {
+                window.location.href = "memberDetails.html";
             }
         })
 
@@ -238,7 +253,7 @@
         success: function (data) {
             if (data.result) {
                 venueProfitRatioOption.series[0].data = [];
-                for (var i = 0; i != data.venueNameList.length; i++) {
+                for (var i = 0; i !== data.venueNameList.length; i++) {
                     var object = {value: data.profitList[i], name: data.venueNameList[i]};
                     venueProfitRatioOption.series[0].data.push(object);
                 }

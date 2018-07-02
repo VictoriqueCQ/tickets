@@ -37,4 +37,6 @@ public interface ManagerService {
     Map<String,Object>activityMonth();
     List<MemberOrderAnalysisVO> memberOrder(Model model);
     List<String> venueDetails(Model model);
+    List<String> memberDetails(Model model);
+    Map<String,Object> venueProfitChange(String venueName);
 }
