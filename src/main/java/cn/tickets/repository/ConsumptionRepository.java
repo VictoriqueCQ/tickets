@@ -23,9 +23,17 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
 
     List<ConsumptionEntity> findByIsboughtAndPredefine(int isbougnt, int predefine);
 
+    //过去三个月某会员未退款的订单类型分布
+    @Query(nativeQuery = true, value = "select * from consumption where predefine<>0 and mid=:mid and date_sub(curdate(), interval 3 month) <= date(orderdate)")
+    List<ConsumptionEntity> effectiveConsumptionsLasterQuarter(@Param("mid") int mid);
+
     //过去一个月某会员消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and mid=:mid and date_sub(curdate(), interval 1 month) <= date(orderdate)")
     List<ConsumptionEntity> consumptionsLastMonth(@Param("mid") int mid);
+
+    //过去一个季度某会员所有消费记录（包括退款的）
+    @Query(nativeQuery = true, value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 3 month) <= date(orderdate)")
+    List<ConsumptionEntity> consumptionsLastQuarter(@Param("mid") int mid);
 
     //过去一年某会员消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
@@ -46,12 +54,15 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
     //过去3个月所有消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and date(orderdate)>=date_sub(curdate(), interval 3 month)")
     List<ConsumptionEntity> allConsumptionLastQuarter();
+
     //过去3-6个月所有消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and date(orderdate)>=date_sub(curdate(), interval 6 month) and date(orderdate)<=date_sub(curdate(), interval 3 month)")
     List<ConsumptionEntity> allConsumptionLastSecondQuarter();
+
     //过去6-9个月所有消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and date(orderdate)>=date_sub(curdate(), interval 9 month) and date(orderdate)<=date_sub(curdate(), interval 6 month)")
     List<ConsumptionEntity> allConsumptionLastThirdQuarter();
+
     //过去9-12个月所有消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and date(orderdate)>=date_sub(curdate(), interval 12 month) and date(orderdate)<=date_sub(curdate(), interval 9 month)")
     List<ConsumptionEntity> allConsumptionLastFourthQuarter();

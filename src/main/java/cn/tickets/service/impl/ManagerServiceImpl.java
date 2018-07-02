@@ -12,6 +12,7 @@ import cn.tickets.service.ManagerService;
 import cn.tickets.util.Default;
 import cn.tickets.vo.ManagementAnalysisVO;
 import cn.tickets.vo.MemberOrderAnalysisVO;
+import cn.tickets.vo.MemberSituationVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import java.lang.reflect.Member;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -695,10 +697,162 @@ public class ManagerServiceImpl implements ManagerService {
         for (int i = 0; i < moneyArray.length; i++) {
             moneyList.add(moneyArray[i]);
         }
-        result.put("moneyList",moneyList);
-        result.put("monthList",monthList);
+        result.put("moneyList", moneyList);
+        result.put("monthList", monthList);
         System.err.println(moneyList.toString());
         System.err.println(monthList.toString());
+        result.put(Default.HTTP_RESULT, true);
+        return result;
+    }
+
+    @Override
+    public List<MemberSituationVO> memberSituation(String memberName) {
+        List<MemberSituationVO> memberSituationVOS = new ArrayList<>();
+        MemberEntity memberEntity = memberRepository.findByName(memberName);
+        List<ConsumptionEntity> consumLastQuarter = consumptionRepository.consumptionsLastQuarter(memberEntity.getId());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(3);
+        List<String> monthList2 = new ArrayList<>(3);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 3; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+        for (int i = 0; i < monthList.size(); i++) {
+            int refundRatio = 0, priceSum = 0, average = 0, refundNumber = 0, allNumber = 0;
+            for (ConsumptionEntity consumptionEntity : consumLastQuarter) {
+                String orderdate = consumptionEntity.getOrderdate().toString();
+                if (orderdate.compareTo(monthList.get(i)) > 0 && orderdate.compareTo(monthList2.get(i)) < 0) {
+                    if (consumptionEntity.getPredefine() == 0) {
+                        refundNumber++;
+                        allNumber++;
+                    } else {
+                        allNumber++;
+                        priceSum += consumptionEntity.getAprice();
+                    }
+                }
+            }
+            MemberSituationVO memberSituationVO = new MemberSituationVO();
+            memberSituationVO.setTime(monthList.get(i));
+            if (allNumber == 0) {
+                String refund = refundRatio + "%";
+                memberSituationVO.setRefund(refund);
+                memberSituationVO.setPriceSum(0);
+                memberSituationVO.setAverage(0);
+            } else {
+                DecimalFormat df2 = new DecimalFormat("0.0");
+                double refundDouble = (double) refundNumber / allNumber * 100;
+                String refund = df2.format(refundDouble) + "%";
+                memberSituationVO.setRefund(refund);
+                memberSituationVO.setPriceSum(priceSum);
+                int averagePrice = priceSum / (allNumber - refundNumber);
+                memberSituationVO.setAverage(averagePrice);
+            }
+            System.err.println(memberSituationVO.toString());
+            memberSituationVOS.add(memberSituationVO);
+        }
+        System.err.println(memberSituationVOS.toString());
+        return memberSituationVOS;
+    }
+
+    @Override
+    public String memberLevel(String memberName) {
+        MemberEntity memberEntity = memberRepository.findByName(memberName);
+        String level = memberEntity.getLevel() + "级";
+        return level;
+    }
+
+    @Override
+    public String memberAllRefund(String memberName) {
+        MemberEntity memberEntity = memberRepository.findByName(memberName);
+        List<ConsumptionEntity> allConsumptions = consumptionRepository.findByMid(memberEntity.getId());
+        int refundNumber = 0, allNumber = 0;
+        for (ConsumptionEntity consumptionEntity : allConsumptions) {
+            allNumber++;
+            if (consumptionEntity.getPredefine() == 0) {
+                refundNumber++;
+            }
+        }
+        DecimalFormat df = new DecimalFormat("0.0");
+        String allRefund;
+        if (allNumber == 0) {
+            allRefund = "0.0%";
+        } else {
+            allRefund = df.format((double) refundNumber / allNumber * 100) + "%";
+        }
+
+        return allRefund;
+    }
+
+    @Override
+    public Map<String, Object> memberActivityDistribution(String memberName) {
+        MemberEntity memberEntity = memberRepository.findByName(memberName);
+        List<ConsumptionEntity> allConsumptions = consumptionRepository.effectiveConsumptionsLasterQuarter(memberEntity.getId());
+        List<String> typeList = new ArrayList<>();
+        for(ConsumptionEntity consumptionEntity:allConsumptions){
+            String type = consumptionEntity.getType();
+            if(!typeList.contains(type)){
+                typeList.add(type);
+            }
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> monthList = new ArrayList<>(3);
+        List<String> monthList2 = new ArrayList<>(3);
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.MONTH, 1);
+        for (int i = 0; i < 3; i++) {
+            Date m = c.getTime();
+            Date m2 = c2.getTime();
+            monthList.add(sdf.format(m));
+            monthList2.add(sdf.format(m2));
+            c.add(Calendar.MONTH, -1);
+            c2.add(Calendar.MONTH, -1);
+        }
+
+        int[][] quantityPerMonthArray = new int[typeList.size()][3];
+        for (int i = 0; i < typeList.size(); i++) {
+            for (int j = 0; j < 3; j++) {
+                quantityPerMonthArray[i][j] = 0;
+            }
+        }
+        for (ConsumptionEntity consumptionEntity : allConsumptions) {
+            String orderdate = consumptionEntity.getOrderdate().toString();
+            for (int i = 0; i < typeList.size(); i++) {
+                if (typeList.get(i).equals(consumptionEntity.getType())) {
+                    for (int j = 0; j < monthList.size(); j++) {
+                        if (orderdate.compareTo(monthList.get(j)) > 0 && orderdate.compareTo(monthList2.get(j)) < 0) {
+                            quantityPerMonthArray[i][j] ++;
+                        }
+                    }
+                }
+            }
+        }
+        List<List<Integer>> profitPerMonth = new ArrayList<>();
+
+        for (int i = 0; i < typeList.size(); i++) {
+            List<Integer> profitPerActivity = new ArrayList<>();
+            for (int j = 0; j < quantityPerMonthArray[i].length; j++) {
+                profitPerActivity.add(quantityPerMonthArray[i][j]);
+            }
+            profitPerMonth.add(profitPerActivity);
+        }
+        Map<String,Object> result = new TreeMap<>();
+        result.put("activityType", typeList);
+        result.put("monthList", monthList);
+        result.put("quantityPerMonth", profitPerMonth);
+
         result.put(Default.HTTP_RESULT, true);
         return result;
     }

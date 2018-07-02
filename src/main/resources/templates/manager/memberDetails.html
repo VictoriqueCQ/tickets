@@ -13,12 +13,137 @@
 </head>
 <body>
 <h1>这是会员详情</h1>
+<div class="mainpage">
+    <div class="container-fluid">
+        <div class="panel panel-info">
+            <div class="panel-heading">会员近三个月详情</div>
+            <table class="table table-hover" id="memberTable">
+                <thead>
+                <tr>
+                    <td>月份</td>
+                    <td>退款率</td>
+                    <td>订票金额</td>
+                    <td>平均单价</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member:${memberSituation}">
+                    <td th:text="${member.time}" style="width: 25%"></td>
+                    <td th:text="${member.refund}" style="width: 25%;"></td>
+                    <td th:text="${member.priceSum}" style="width: 25%;"></td>
+                    <td th:text="${member.average}" style="width: 25%;"></td>
+                </tr>
+                </tbody>
 
+            </table>
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-3">
+                <h4>会员等级：</h4>
+                <p th:text="${level}"></p>
+            </div>
+
+            <div class="col-md-3">
+                <h4>历史退款率：</h4>
+                <p th:text="${allRefund}"></p>
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+        </div>
+        <br/>
+        <br/>
+        <div id="activityDistribution" style="width: 1400px;height: 700px"></div>
+    </div>
+</div>
 
 <script src="../../static/js/jquery-3.1.1.min.js" th:src="@{../../static/js/jquery-3.1.1.min.js}"></script>
 <script src="../../static/js/bootstrap.min.js" th:src="@{../../static/js/bootstrap.min.js}"></script>
-<script type="text/javascript" th:inline="javascript"></script>
+<script type="text/javascript" th:inline="javascript">
 
+
+    var activityDistributionChart = echarts.init(document.getElementById("activityDistribution"));
+    var activityDistributionOption = {
+        title: {
+            text: '会员不同类型活动数量分布变化'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: ['直接访问', '邮件营销', '联盟广告']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['周一', '周二', '周三']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                name: '直接访问',
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'insideRight'
+                    }
+                },
+                data: [320, 302, 301]
+            },
+            {
+                name: '邮件营销',
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'insideRight'
+                    }
+                },
+                data: [120, 132, 101]
+            },
+            {
+                name: '联盟广告',
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'insideRight'
+                    }
+                },
+                data: [220, 182, 191]
+            }
+        ]
+    };
+    $.ajax({
+        url: '/manager/memberActivityDistribution',
+        data: '',
+        dataType: 'json',
+        success: function (data) {
+            if (data.result) {
+                activityDistributionOption.legend.data = Array.from(data.activityType);
+                activityDistributionOption.xAxis.data = Array.from(data.monthList);
+                for (var i = 0; i !== data.activityType.length; i++) {
+                    activityDistributionOption.series[i].name = data.activityType[i];
+                    activityDistributionOption.series[i].data = data.quantityPerMonth[i];
+                }
+            }
+            activityDistributionChart.setOption(activityDistributionOption);
+        }
+    });
+</script>
 
 
 </body>

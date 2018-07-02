@@ -6,6 +6,7 @@ import cn.tickets.entity.VenueEntity;
 import cn.tickets.vo.ManagementAnalysisVO;
 import cn.tickets.vo.MemberInfoVO;
 import cn.tickets.vo.MemberOrderAnalysisVO;
+import cn.tickets.vo.MemberSituationVO;
 import org.springframework.ui.Model;
 
 import java.util.List;
@@ -39,4 +40,9 @@ public interface ManagerService {
     List<String> venueDetails(Model model);
     List<String> memberDetails(Model model);
     Map<String,Object> venueProfitChange(String venueName);
+    List<MemberSituationVO>memberSituation(String memberName);
+    String memberLevel(String memberName);
+    String memberAllRefund(String memberName);
+    Map<String,Object> memberActivityDistribution(String memberName);
+
 }

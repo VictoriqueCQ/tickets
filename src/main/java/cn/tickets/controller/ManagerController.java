@@ -149,7 +149,9 @@ public class ManagerController {
     @RequestMapping("/memberDetails")
     public String memberDetails(Model model){
         String memberName = this.memberName;
-//        model.addAttribute("memberDetails",managerService.memberDetails(memberName));
+        model.addAttribute("memberSituation",managerService.memberSituation(memberName));
+        model.addAttribute("level",managerService.memberLevel(memberName));
+        model.addAttribute("allRefund",managerService.memberAllRefund(memberName));
         return "manager/memberDetails";
     }
 
@@ -164,5 +166,11 @@ public class ManagerController {
     public Map<String,Object> venueProfitChange(){
         System.err.println("venueName:"+venueName);
         return managerService.venueProfitChange(venueName);
+    }
+
+    @RequestMapping("/memberActivityDistribution")
+    @ResponseBody
+    public Map<String,Object> memberActivityDistribution(){
+        return managerService.memberActivityDistribution(memberName);
     }
 }
