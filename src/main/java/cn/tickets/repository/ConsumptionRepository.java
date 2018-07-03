@@ -23,6 +23,7 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
 
     List<ConsumptionEntity> findByIsboughtAndPredefine(int isbougnt, int predefine);
 
+    //以下是管理信息系统新增代码
     //过去三个月某会员未退款的订单类型分布
     @Query(nativeQuery = true, value = "select * from consumption where predefine<>0 and mid=:mid and date_sub(curdate(), interval 3 month) <= date(orderdate)")
     List<ConsumptionEntity> effectiveConsumptionsLasterQuarter(@Param("mid") int mid);

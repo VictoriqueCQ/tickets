@@ -12,10 +12,10 @@
     <title>场馆详情</title>
 </head>
 <body>
-<h1>这是场馆详情</h1>
+
 <div class="mainpage">
     <div class="container-fluid">
-        <h1>过去四个季度本场馆收益变化</h1>
+
         <div id="profitChange" style="width: 1600px;height: 900px">
         </div>
     </div>
@@ -26,9 +26,9 @@
 <script type="text/javascript" th:inline="javascript">
     var profitChangeChart = echarts.init(document.getElementById('profitChange'));
     var profitChangeOption = {
-        // title:{
-        //     text:'过去一年Tickets平台收益变化'
-        // },
+        title:{
+            text:'过去一年本场馆平台收益变化'
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效

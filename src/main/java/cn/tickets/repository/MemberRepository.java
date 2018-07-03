@@ -24,6 +24,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
 
     MemberEntity findByEmail(String email);
 
+
+    //管理信息系统新增代码
     MemberEntity findByName(String name);
 
 

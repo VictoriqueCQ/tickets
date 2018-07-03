@@ -19,7 +19,6 @@ public interface VenueService {
 
     //以下是管理信息系统新增代码
     List<String> analysis(Model model,int vid);
-
     Map<String, Object> memberNumber(int vid);
     Map<String, Object> profitAverage(int vid);
     Map<String, Object> unitPriceChange(int vid);

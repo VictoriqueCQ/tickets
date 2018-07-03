@@ -150,7 +150,7 @@
                 <br/>
                 <br/>
                 <div class="panel panel-info">
-                    <div class="panel-heading">具体场馆</div>
+                    <div class="panel-heading">具体会员</div>
                     <table class="table table-hover" id="memberTable">
                         <tr th:each="member:${memberDetails}">
                             <td class="memberName" th:text="${member}" style="width: 50%;">场馆a</td>
@@ -456,7 +456,7 @@
     var orderMonthChart = echarts.init(document.getElementById('order-month'));
     var orderMonthOption = {
         title: {
-            text: '活跃场馆数量变化'
+            text: '每月订单数量变化'
         },
         xAxis: {
             type: 'category',

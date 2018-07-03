@@ -112,6 +112,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
 
+    //以下是管理信息系统新增代码
     @Override
     public List<String> analysis(Model model, int vid) {
         List<ConsumptionEntity> venueConsumptionListLastYear = consumptionRepository.venueConsumptionLastYear(vid);
