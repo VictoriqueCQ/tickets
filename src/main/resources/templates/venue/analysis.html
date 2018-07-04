@@ -254,7 +254,7 @@
             }
         },
         legend: {
-            data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+            data: ['直接访问', '邮件营销', '联盟广告']
         },
         grid: {
             left: '3%',
@@ -262,37 +262,32 @@
             bottom: '3%',
             containLabel: true
         },
-        xAxis: {
-            type: 'category',
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-        yAxis: {
-            type: 'value'
-        },
+        xAxis: [
+            {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
         series: [
             {
                 name: '直接访问',
                 type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [320, 302, 301, 334, 390, 330, 320]
+                data: [320, 332, 301, 334, 390, 330, 320]
             },
             {
                 name: '邮件营销',
                 type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
                 data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: '联盟广告',
+                type: 'bar',
+                data: [220, 182, 191, 234, 290, 330, 310]
             }
         ]
     };
@@ -301,7 +296,9 @@
         data: '',
         dataType: 'json',
         success: function (data) {
+            JSON.stringify(data.result);
             if (data.result) {
+
                 profitDistributionOption.legend.data = Array.from(data.activityType);
                 profitDistributionOption.xAxis.data = Array.from(data.monthList);
                 for (var i = 0; i != data.activityType.length; i++) {
@@ -325,7 +322,7 @@
             }
         },
         legend: {
-            data: []
+            data: ['直接访问', '邮件营销', '联盟广告']
         },
         grid: {
             left: '3%',
@@ -333,40 +330,32 @@
             bottom: '3%',
             containLabel: true
         },
-        xAxis: {
-            type: 'category',
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-        },
-        yAxis: {
-            type: 'value',
-            axisLabel: {
-                formatter: '{value} 次'
+        xAxis: [
+            {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
             }
-        },
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
         series: [
             {
                 name: '直接访问',
                 type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
-                data: [320, 302, 301, 334, 390, 330, 320]
+                data: [320, 332, 301, 334, 390, 330, 320]
             },
             {
                 name: '邮件营销',
                 type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'insideRight'
-                    }
-                },
                 data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+                name: '联盟广告',
+                type: 'bar',
+                data: [220, 182, 191, 234, 290, 330, 310]
             }
         ]
     };
@@ -375,7 +364,9 @@
         data: '',
         dataType: 'json',
         success: function (data) {
+            JSON.stringify(data.result);
             if (data.result) {
+
                 activityDistributionOption.legend.data = Array.from(data.activityType);
                 activityDistributionOption.xAxis.data = Array.from(data.monthList);
                 for (var i = 0; i != data.activityType.length; i++) {

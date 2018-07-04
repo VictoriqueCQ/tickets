@@ -52,9 +52,7 @@ public class MemberServiceImpl implements MemberService {
         List<ConsumptionEntity> bookConsumptionEntities = consumptionRepository.findByMidAndPredefine(mid, 1);//预订订单
         List<ConsumptionEntity> unsubscribeConsumptionEntities = consumptionRepository.findByMidAndPredefine(mid, 0);//退订订单
         List<ConsumptionEntity> completeConsumptionEntities = consumptionRepository.findByMidAndPredefine(mid, 2);//完成订单
-//        System.err.println("statistics预订订单：" + bookConsumptionEntities.toString());
-//        System.err.println("statistics退订订单：" + unsubscribeConsumptionEntities.toString());
-//        System.err.println("statistics完成订单：" + completeConsumptionEntities.toString());
+
         model.addAttribute("statistics", buildMemberStatisticsVO(bookConsumptionEntities, unsubscribeConsumptionEntities, completeConsumptionEntities));
         return "member/statistics";
     }
@@ -200,7 +198,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberAnalysisVO analysis(int mid) {
         MemberAnalysisVO memberAnalysisVO = new MemberAnalysisVO();
-        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
+        List<ConsumptionEntity> listLastYear = consumptionRepository.allConsumptionsLastYear(mid);
 //        System.err.println(listLastYear.toString());
         List<ConsumptionEntity> listLastMonth = consumptionRepository.consumptionsLastMonth(mid);
 //        System.err.println(listLastMonth.toString());
@@ -231,6 +229,7 @@ public class MemberServiceImpl implements MemberService {
             int allPriceLastYear = 0;
             int refundTime = 0;//退单单数
             for (ConsumptionEntity consumptionEntity : listLastYear) {
+//                System.err.println(consumptionEntity.getPredefine());
                 allPriceLastYear += consumptionEntity.getAprice();
                 activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
                 venueIdSet.add(consumptionEntity.getVid());//获得所有场馆id的集合
@@ -250,11 +249,12 @@ public class MemberServiceImpl implements MemberService {
             orderRatio = df.format((double) listLastYear.size() / 12) + "单/月";
 
 
+            List<ConsumptionEntity> completeListLastYear = consumptionRepository.consumptionsLastYear(mid);
             //活动集合
             TreeMap<String, Integer> activityMap = new TreeMap<>();
             for (String activity : activitySet) {
                 int num = 0;
-                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                for (ConsumptionEntity consumptionEntity : completeListLastYear) {
                     if (consumptionEntity.getType().equals(activity)) {
                         num += 1;
                     }
@@ -267,7 +267,7 @@ public class MemberServiceImpl implements MemberService {
                 //获得最大参加次数
                 activityMaxTimes = activityMaxTimes >= time ? activityMaxTimes : time;
             }
-
+            System.err.println("参加最多的活动次数"+activityMaxTimes);
             for (String getKey : activityMap.keySet()) {
                 //获得最大参加次数的活动的列表
                 if (activityMap.get(getKey) == activityMaxTimes) {
@@ -280,7 +280,7 @@ public class MemberServiceImpl implements MemberService {
             TreeMap<Integer, Integer> venueMap = new TreeMap<>();
             for (Integer venueId : venueIdSet) {
                 int num = 0;
-                for (ConsumptionEntity consumptionEntity : listLastYear) {
+                for (ConsumptionEntity consumptionEntity : completeListLastYear) {
                     if (consumptionEntity.getVid() == venueId) {
                         num += 1;
                     }
@@ -327,30 +327,52 @@ public class MemberServiceImpl implements MemberService {
         List<Integer> numberList = new ArrayList<>();
         List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
         if (listLastYear.size() > 0) {
-            TreeSet<String> activitySet = new TreeSet<>();
-            for (ConsumptionEntity consumptionEntity : listLastYear) {
-                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+            List<String> activityTypeList = new ArrayList<>();
+            for(ConsumptionEntity consumptionEntity:listLastYear){
+                if(!activityTypeList.contains(consumptionEntity.getType())){
+                    activityTypeList.add(consumptionEntity.getType());
+                }
+//                System.err.println(consumptionEntity.toString()+"————————————————————"+activityTypeList.toString());
             }
+//            TreeSet<String> activitySet = new TreeSet<>();
+//            for (ConsumptionEntity consumptionEntity : listLastYear) {
+//                activitySet.add(consumptionEntity.getType());//获得所有活动类型的集合
+//            }
             //活动集合
-            TreeMap<String, Integer> activityMap = new TreeMap<>();
-            for (String activity : activitySet) {
+            List<Integer> activityTime = new ArrayList<>();
+            for(String activityType:activityTypeList){
                 int num = 0;
-                for (ConsumptionEntity consumptionEntity : listLastYear) {
-                    if (consumptionEntity.getType().equals(activity)) {
-                        num += 1;
+                for(ConsumptionEntity consumptionEntity:listLastYear){
+                    if(consumptionEntity.getType().equals(activityType)){
+                        num+=1;
                     }
                 }
-                //获得所有活动参加的次数
-                activityMap.put(activity, num);
+                activityTime.add(num);
             }
-            for (String getKey : activityMap.keySet()) {
-                activityList.add(getKey);
-                numberList.add(activityMap.get(getKey));
+//            TreeMap<String, Integer> activityMap = new TreeMap<>();
+//            for (String activity : activitySet) {
+//                int num = 0;
+//                for (ConsumptionEntity consumptionEntity : listLastYear) {
+//                    if (consumptionEntity.getType().equals(activity)) {
+//                        num += 1;
+//                    }
+//                }
+//                //获得所有活动参加的次数
+//                activityMap.put(activity, num);
+//            }
+            for(int i = 0;i<activityTypeList.size();i++){
+                activityList.add(activityTypeList.get(i));
+                numberList.add(activityTime.get(i));
             }
+//            for (String getKey : activityMap.keySet()) {
+//                activityList.add(getKey);
+//                numberList.add(activityMap.get(getKey));
+//            }
         } else {
             activityList.add("无");
             numberList.add(0);
         }
+//        System.err.println("activityList"+activityList.toString());
         result.put("activityList", activityList);
         result.put("numberList", numberList);
         result.put(Default.HTTP_RESULT, true);
@@ -361,7 +383,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Map<String, Object> consumptionDistribution(int mid) {
         Map<String, Object> result = new TreeMap<>();
-        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastMonth(mid);
+        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         List<String> monthList = new ArrayList<>(12);
         List<String> monthList2 = new ArrayList<>(12);
@@ -392,8 +414,14 @@ public class MemberServiceImpl implements MemberService {
                 }
             }
         }
+//        for(int i = 0;i<monthList.size();i++){
+//            for(ConsumptionEntity consumptionEntity:listLastYear){
+//                String
+//            }
+//        }
 //        System.err.println(moneyArray.toString());
         for(int i = 0;i<moneyArray.length;i++){
+//            System.err.println("moneyArray:"+moneyArray[i]);
             moneyList.add(moneyArray[i]);
         }
         result.put("monthList",monthList);
@@ -406,7 +434,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Map<String, Object> venueDistribution(int mid) {
         Map<String, Object> result = new TreeMap<>();
-        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastMonth(mid);
+        List<ConsumptionEntity> listLastYear = consumptionRepository.consumptionsLastYear(mid);
         List<String> venueList = new ArrayList<>();
         List<Integer> numberList = new ArrayList<>();
         if (listLastYear.size() > 0) {

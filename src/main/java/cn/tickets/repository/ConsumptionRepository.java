@@ -36,9 +36,13 @@ public interface ConsumptionRepository extends JpaRepository<ConsumptionEntity, 
     @Query(nativeQuery = true, value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 3 month) <= date(orderdate)")
     List<ConsumptionEntity> consumptionsLastQuarter(@Param("mid") int mid);
 
-    //过去一年某会员消费记录
+    //过去一年某会员完成的消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
     List<ConsumptionEntity> consumptionsLastYear(@Param("mid") int mid);
+
+    //过去一年某会员所有消费记录（包括退款）
+    @Query(nativeQuery = true, value = "select * from consumption where mid=:mid and date_sub(curdate(), interval 12 month) <= date(orderdate)")
+    List<ConsumptionEntity> allConsumptionsLastYear(@Param("mid") int mid);
 
     //过去一年某场馆消费记录
     @Query(nativeQuery = true, value = "select * from consumption where predefine=2 and vid=:vid and date_sub(curdate(), interval 12 month) <= date(orderdate)")

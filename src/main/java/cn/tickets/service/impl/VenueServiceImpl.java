@@ -320,6 +320,11 @@ public class VenueServiceImpl implements VenueService {
             profitPerMonth.add(profitPerActivity);
         }
 
+        System.err.println("ProfitDistribution");
+        System.err.println("------------------");
+        System.err.println("activityType"+activityName);
+        System.err.println("monthList"+monthList);
+        System.err.println("profitPerMonth"+profitPerMonth);
         result.put("activityType", activityName);
         result.put("monthList", monthList);
         result.put("profitPerMonth", profitPerMonth);
@@ -385,7 +390,11 @@ public class VenueServiceImpl implements VenueService {
             }
             numberPerMonth.add(numberPerActivity);
         }
-
+        System.err.println("ActivityDistribution");
+        System.err.println("------------------");
+        System.err.println("activityType"+activityName);
+        System.err.println("monthList"+monthList);
+        System.err.println("numberPerMonth"+numberPerMonth);
         result.put("activityType", activityName);
         result.put("monthList", monthList);
         result.put("numberPerMonth", numberPerMonth);
