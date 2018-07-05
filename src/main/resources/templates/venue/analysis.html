@@ -300,7 +300,7 @@
             if (data.result) {
 
                 profitDistributionOption.legend.data = Array.from(data.activityType);
-                profitDistributionOption.xAxis.data = Array.from(data.monthList);
+                profitDistributionOption.xAxis[0].data = Array.from(data.monthList);
                 for (var i = 0; i != data.activityType.length; i++) {
                     profitDistributionOption.series[i].name = data.activityType[i];
                     profitDistributionOption.series[i].data = data.profitPerMonth[i];
@@ -368,7 +368,7 @@
             if (data.result) {
 
                 activityDistributionOption.legend.data = Array.from(data.activityType);
-                activityDistributionOption.xAxis.data = Array.from(data.monthList);
+                activityDistributionOption.xAxis[0].data = Array.from(data.monthList);
                 for (var i = 0; i != data.activityType.length; i++) {
                     activityDistributionOption.series[i].name = data.activityType[i];
                     activityDistributionOption.series[i].data = data.numberPerMonth[i];
